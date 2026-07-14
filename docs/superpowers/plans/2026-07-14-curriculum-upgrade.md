@@ -110,7 +110,7 @@ Expected: no output (pass).
 
 **Files:** none touched yet — this phase only populates `sources/`.
 
-- [ ] **Step 1: Fetch free/legal sources.** Use WebFetch/WebSearch to pull NCERT Maths/English/EVS Class 1–6 PDFs (ncert.nic.in), Singapore MOE Maths/English/Science syllabus docs (moe.gov.sg), Math Kangaroo + AMC 8 past papers, SASMO/NSO/iOS/iOEL sample papers, ABRSM/Trinity piano syllabus docs. Save each into the matching `sources/<subject>/` folder with a clear filename (`sources/maths/ncert-class3-maths.pdf`, etc).
+- [x] **Step 1: Fetch free/legal sources.** DONE 2026-07-14, commit `2d71ece`, 24 files / 127MB in `sources/`. Got: NCERT Maths Cl.1-6 (complete), NCERT English Cl.1/3/5, NCERT EVS/Science Cl.3-7, MOE Maths/English/Science syllabus (2013/2020/2008 editions — newer editions 404 on moe.gov.sg's restructured site, these are the best available), Math Kangaroo Pre-Ecolier + IKMC Ecolier samples, AMC8 compendium 1985-2026, SOF IEO/NSO/ISO samples Cl.1/3/5, ABRSM Piano Syllabus 2025-26. **Not sourced free (do not fabricate around these gaps):** NCERT English/EVS Class 2 and 4 (direct PDF codes didn't resolve), SASMO primary-grade P2-P6 samples (official site only has secondary-grade), Trinity piano syllabus (portal-gated, no direct PDF).
 - [ ] **Step 2: User supplies commercial sources.** User drops Saxon Math, Singapore Primary Mathematics/My Pals Are Here English, Beast Academy, Wordly Wise, Evan-Moor into the matching `sources/` subfolders.
 - [ ] **Step 3: Inventory check.** List `sources/**` and cross-reference against the rung-map tables above — flag any rung with zero matching source (that rung's task in Phase 2+ stays blocked until either a source arrives or we explicitly decide to hand-author it from Olympiad-only material).
 
