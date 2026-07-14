@@ -475,7 +475,8 @@ function m_words(L){const B=[],a=[];let idx=0;const num=()=>P(NAMES);
  else if(L.dec){const r1=R(2,9),p1=R(1,9)*5,r2=R(2,9),p2=R(1,9)*5;const t=(r1*100+p1)+(r2*100+p2);B.push((++idx)+')  '+num()+' buys milk for ₹'+r1+'.'+String(p1).padStart(2,'0')+' and bread for ₹'+r2+'.'+String(p2).padStart(2,'0')+'. What is the total?');a.push('₹'+Math.floor(t/100)+'.'+String(t%100).padStart(2,'0'));}
  // 2) a steps-based problem (2 or 3 step)
  if(L.s>=3){const per=R(3,7),g=R(3,5),rest=per*g,m=R(4,15),n=R(4,15),S=rest+m+n;B.push((++idx)+')  A shop starts with '+S+' stickers. It sells '+m+' in the morning and '+n+' in the afternoon, then packs the rest equally into '+g+' boxes. How many stickers per box?');a.push(per+' per box');}
- else{const p=R(4,8),q=R(4,9),give=R(3,p*q-2);B.push((++idx)+')  '+num()+' buys '+p+' packets of stickers with '+q+' in each, then gives '+give+' away. How many are left?');a.push(p*q-give);}
+ else if(R(0,1)===0){const p=R(4,8),q=R(4,9),give=R(3,p*q-2);B.push((++idx)+')  '+num()+' buys '+p+' packets of stickers with '+q+' in each, then gives '+give+' away. How many are left?');a.push(p*q-give);}
+ else{const g=R(2,6),share=R(3,9),T=g*share,n=R(1,g-1);B.push((++idx)+')  '+num()+' shares '+T+' mangoes equally among '+g+' friends. If '+n+' of the friends eat their whole share, how many mangoes have been eaten in total?');a.push((share*n)+' mangoes eaten ('+share+' each)');}
  // 3) a change / division problem
  {const c=R(6,19),cnt=R(3,6),tot=c*cnt,pay=Math.ceil((tot+R(5,40))/10)*10;B.push((++idx)+')  Pens cost ₹'+c+' each. '+num()+' buys '+cnt+' and pays with a ₹'+pay+' note. How much change?');a.push('₹'+(pay-tot));}
  return{items:B,a};}
