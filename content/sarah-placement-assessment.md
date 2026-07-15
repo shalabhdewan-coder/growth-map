@@ -29,5 +29,30 @@ Source: 9 PDFs from Pathways School Gurgaon, PYP 3 (IB Primary Years Programme Y
 
 **Recommendation: Rung 4-5 (Opinion & why / Multi-paragraph) as her English baseline**, not rung 1. **Confidence: medium** — only 2 samples, no vocabulary-list or grammar-specific evidence at all, so the `vt`/`gt` (vocab tier / grammar tier) knobs are still a guess rather than evidence-grounded. Recommend treating this placement as provisional and re-checking once a grammar/vocab-specific sample is available.
 
+## Update — 7 more PDFs, Nov 2025–Jan 2026 (earlier in the school year than the batch above)
+
+IMPORTANT CAVEAT surfaced by this batch: these are all "PYP 3" documents — Sarah's *previous* school year. If she has since moved up a grade, this whole assessment (both batches) is a **floor from last year**, not necessarily where she is right now. Treat the rung numbers below as a confirmed lower bound, likely to undershoot her current level further.
+
+### Maths — confirms rung 6, and confirms the rung-10-12 track is routine, not occasional
+
+| Date | File | Content | Rung-equivalent |
+|---|---|---|---|
+| Nov 10 | Measurement Asynchronous | m/cm/mm conversion, ordering lengths, ordering family heights (mixed units) | Rung 2-3 — routine floor, early in the year |
+| Dec | "Math Rigour and Recap 2025" | 4-digit×1-digit multiplication, coordinate-grid plotting/reading, line-graph interpretation, tally/bar-graph vocab, 3-step word problems, chained function machines (+12,+6,+8,+15), symmetry | Rung 4-6 — clean match, AND reveals a real content gap: **coordinate graphs, data handling (tally/bar/line), and symmetry appear nowhere in the current maths ladder's generators at any rung.** Worth a task when building out rungs 2-9. |
+| Jan 17 | "Math Asynchronous Task" (LO: "enhance critical thinking skills" — note, NOT labeled "Thursday Prep," this is a routine asynchronous task) | Grid-logic deduction from spatial+colour clues, combinatorics ("4 cards 1-8 summing to 20, find all 7 possibilities"), 3-variable simultaneous-equations word problem (bags of flour), CRT-style remainder puzzle ("between 30-50, mod 4 = 2, mod 5 = 1") | **Rung 10-12 equivalent** — same family as what's already built into rung 12 (the CRT puzzle is functionally identical to rung 12's logic/number-theory additions). Critically, this appearing under a plain "Asynchronous task" label (not the special "Thursday Prep" naming) confirms this difficulty tier is a **routine recurring feature of her coursework since at least November**, not a one-off enrichment sheet. |
+
+**Rung 6 recommendation stands, confidence unchanged (high).** No new evidence to shift the floor. The Jan 17 sheet is the third independent data point (after the two March "Thursday Prep" sheets) showing the rung-10-12 critical-thinking track is routine across at least 3 months (Nov→March), not occasional.
+
+### English — grammar/vocab gap now closed, rung 4 confirmed with higher confidence
+
+| Date | File | Content | Rung-equivalent |
+|---|---|---|---|
+| Nov 10 | Prepositions Asynchronous | Real BBC-sourced nonfiction passage (Delhi air pollution), preposition-of-place/time identification in context, fill-in-the-blank prepositions, informal letter creative-writing task | Rung 3-4 — this is the grammar/vocab evidence that was missing before |
+| Nov 24 | "Thursday Prep" (English, not maths this time) | MCQ reading comprehension — vocab-in-context ("which word means...") + inference, two short factual passages (Great Barrier Reef, Everest) | Rung 2-3 — simpler than the March poem-comprehension sample, MCQ format not open response |
+| Dec/Winter | "Rigour and Recap" booklet | Mixed: a substantial climate-change nonfiction passage (glossary terms, opinion questions, "why should we worry" reasoning) at rung 3-4, PLUS a much easier "Fireflies" comprehension + basic adjective-identification task at rung 1-2 — deliberately mixed since it's explicitly a "recap" (review) booklet, not a ceiling indicator | Confirms rung 3-4 band for current work; the easy end is intentional review, not her level |
+| Jan 17 | English Asynchronous | Nonfiction comprehension (satellites, raz-plus-sourced), fact recall + define-in-own-words + causal reasoning, extended opinion/detail writing (12 lines allotted), "I used to think / now I think" reflection | Rung 3-4, writing-length demand pushes toward rung 4-5 |
+
+**Rung 4 recommendation stands, confidence upgraded from medium to high.** The grammar gap flagged in the first pass is now closed (Nov 10 prepositions-in-context sheet) — mid-tier grammar difficulty (`gt` knob) is evidence-grounded now, not a guess. The extended-writing tasks appearing repeatedly (informal letter, 12-line opinion piece) support treating rung 4-5 as the right band; staying conservative at rung 4 since none of the samples show the specific 2-linked-paragraph structure that rung 5 ("Multi-paragraph") formally tests.
+
 ## What I did NOT do
-Did not edit `growth-map.html` or change `LEVEL.sarah` values — assessment only, per directive. Source PDFs left in place at `content/sarah-current-level/`, not moved or deleted.
+Did not edit `growth-map.html` or change `LEVEL.sarah` values in either pass — assessment only, per directive. Source PDFs left in place at `content/sarah-current-level/`, not moved or deleted.
