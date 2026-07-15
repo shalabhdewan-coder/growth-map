@@ -185,7 +185,7 @@ const LEVELS={
    {n:'Pre-algebra',            longmul:1, algebra:1,s:3, bar:'ratio',patt:'seq',  chal:4},
    {n:'Algebra & geometry',     algebra:2, geom:1,   s:3, bar:'pct',  patt:'quad', chal:5},
    {n:'Competition heuristics', algebra:2, geom:1, comp:1, s:3, bar:'ratio', patt:'quad', chal:5},
-   {n:'The quantitative spike', algebra:2, geom:1, comp:1, proof:1, s:3, bar:'pct', patt:'quad', chal:6}
+   {n:'The quantitative spike', algebra:2, geom:1, comp:1, proof:1, logic:1, s:3, bar:'pct', patt:'quad', chal:6}
   ],
   english:[
    {n:'Comprehension',        vt:'easy',  pt:1, gt:'easy', gc:4, write:'para'},
@@ -473,6 +473,7 @@ function m_words(L){const B=[],a=[];let idx=0;const num=()=>P(NAMES);
  else if(L.ratio){const k=R(2,7),x=P([2,3,4]),y=P([3,5]),tot=(x+y)*k;B.push((++idx)+')  '+num()+' shares ₹'+tot+' with a friend in the ratio '+x+':'+y+'. How much does each get?');a.push('₹'+(x*k)+' and ₹'+(y*k));}
  else if(L.frac){const d=P([3,4,5]),k=R(3,8),whole=d*k,num2=R(1,d-1),got=num2*k;B.push((++idx)+')  A class has '+whole+' children. '+num2+'/'+d+' of them walk to school. How many walk, and how many do not?');a.push(got+' walk, '+(whole-got)+' do not');}
  else if(L.dec){const r1=R(2,9),p1=R(1,9)*5,r2=R(2,9),p2=R(1,9)*5;const t=(r1*100+p1)+(r2*100+p2);B.push((++idx)+')  '+num()+' buys milk for ₹'+r1+'.'+String(p1).padStart(2,'0')+' and bread for ₹'+r2+'.'+String(p2).padStart(2,'0')+'. What is the total?');a.push('₹'+Math.floor(t/100)+'.'+String(t%100).padStart(2,'0'));}
+ else if(L.algebra>=2){const v1=R(3,9),v2=R(3,9),v3=R(3,9),v4=R(3,9),mx=Math.max(v1,v2,v3,v4),M=R(mx+6,mx+35),vBig=5*M-(v1+v2+v3+v4);const sorted=[v1,v2,v3,v4,vBig].slice().sort((p,q)=>p-q),med=sorted[2],who=num();B.push((++idx)+')  '+who+' is the oldest of 5 cousins and weighs '+vBig+' kg. '+who+'’s 4 younger cousins weigh '+v1+', '+v2+', '+v3+' and '+v4+' kg. For all 5 cousins together, which is greater — the mean (average) weight or the median weight — and by how many kg?');a.push('mean = '+M+' kg, median = '+med+' kg → mean is greater by '+(M-med)+' kg');}
  // 2) a steps-based problem (2 or 3 step)
  if(L.s>=3){const per=R(3,7),g=R(3,5),rest=per*g,m=R(4,15),n=R(4,15),S=rest+m+n;B.push((++idx)+')  A shop starts with '+S+' stickers. It sells '+m+' in the morning and '+n+' in the afternoon, then packs the rest equally into '+g+' boxes. How many stickers per box?');a.push(per+' per box');}
  else if(R(0,1)===0){const p=R(4,8),q=R(4,9),give=R(3,p*q-2);B.push((++idx)+')  '+num()+' buys '+p+' packets of stickers with '+q+' in each, then gives '+give+' away. How many are left?');a.push(p*q-give);}
@@ -538,6 +539,22 @@ function m_geometry(){const opt=R(0,2);
  if(opt===1){const a1=R(30,80),a2=R(30,150-a1);return{h:'G. Geometry — a triangle',items:['Two angles of a triangle are '+a1+'° and '+a2+'°. Find the third angle.'],write:2,a:'G: '+(180-a1-a2)+'°'};}
  const b=R(4,12),h=R(2,5)*2;return{h:'G. Geometry — a triangle’s area',items:['A triangle has base '+b+' cm and height '+h+' cm. Find its area.'],write:2,a:'G: '+(b*h/2)+' cm²'};}
 
+/* Deduction/ordering puzzle — same logical skeleton as 1999 AMC 8 Problem 6 (5 people,
+   comparison clues, asks who has the LEAST even though the full order can't be pinned down).
+   Names/roles/item are re-randomised each call; the underlying relations (F>B, F>J, B>M,
+   C>M, B>J, J>M) are fixed so the puzzle is always solvable and the least is always unique. */
+function m_logic(L){const nm=[...NAMES].sort(()=>Math.random()-0.5);
+ const F=nm[0],B=nm[1],J=nm[2],M=nm[3],C=nm[4];
+ const io=P([{item:'money',much:'much'},{item:'marbles',much:'many'},{item:'stickers',much:'many'},{item:'house points',much:'many'}]),item=io.item;
+ const clues=['Neither '+J+' nor '+B+' has as '+io.much+' '+item+' as '+F+'.',
+   'Both '+B+' and '+C+' have more '+item+' than '+M+'.',
+   J+' has more '+item+' than '+M+', but less than '+B+'.'];
+ return{h:'H. Logic puzzle — who definitely has the least? (AMC 8 style)',
+  items:[F+', '+B+', '+J+', '+M+' and '+C+' each have a different amount of '+item+'.  '+clues.join('  '),
+   'Who definitely has the least '+item+'? You will NOT be able to work out everyone’s exact order — explain how you can still be sure of the answer.'],
+  write:4,
+  a:'H: '+M+' has the least. '+F+' > '+B+' > '+J+' > '+M+', and '+C+' > '+M+' too — so every other person has more '+item+' than '+M+'; '+M+' must be last even though '+C+'’s exact rank stays unknown.'};}
+
 function ws_maths_sarah(li){const L=LEVELS.sarah.maths[li];let blocks=[],ans=[];
  const w=m_warm(L);blocks.push({h:'A. Warm-up — quick fire',two:true,items:w.items});ans.push('A: '+w.a.join(', '));
  const wp=m_words(L);blocks.push({h:'B. Word problems — show every step',items:wp.items,write:3});ans.push('B: '+wp.a.join('; '));
@@ -546,10 +563,11 @@ function ws_maths_sarah(li){const L=LEVELS.sarah.maths[li];let blocks=[],ans=[];
  const mis=m_mistake(L);blocks.push({h:mis.h,items:mis.items,write:mis.write});ans.push(mis.a);
  if(L.algebra){const al=m_algebra(L);blocks.push({h:al.h,items:al.items,write:al.write});ans.push(al.a);}
  if(L.geom){const ge=m_geometry();blocks.push({h:ge.h,items:ge.items,write:ge.write});ans.push(ge.a);}
+ if(L.logic){const lg=m_logic(L);blocks.push({h:lg.h,items:lg.items,write:lg.write});ans.push(lg.a);}
  const ch=P(CHAL[L.chal]||CHAL[3]);blocks.push({h:'★ Challenge — think hard, take your time'+(L.comp?' (competition-style)':''),items:[ch[0]],write:4});ans.push('★: '+ch[1]);
  if(L.proof){blocks.push({h:'★★ Prove it',items:['Explain, in your own words and with an example, WHY the challenge answer above must be true.'],write:4});ans.push('★★: reward a clear reason + a worked example.');}
  return{title:'Maths Worksheet — Sarah (8)',sub:'Level '+(li+1)+'/'+LEVELS.sarah.maths.length+' · '+L.n,level:mLevelTag(li),blocks,ans};}
-function mLevelTag(li){const map=['Singapore P3 · fluency + 2-step','Singapore P3+ · larger numbers','Singapore P3–P4 · 3-step','P4 · fractions of a quantity','P4 · decimals & money','P4–P5 · long multiplication','P5 · ratio','P5 · percentages','P5–P6 · pre-algebra','P6 + a taste of SASMO / geometry','Competition heuristics (SASMO / Math Kangaroo)','The quantitative spike — algebra · geometry · proof'];return map[li]||'Sarah maths';}
+function mLevelTag(li){const map=['Singapore P3 · fluency + 2-step','Singapore P3+ · larger numbers','Singapore P3–P4 · 3-step','P4 · fractions of a quantity','P4 · decimals & money','P4–P5 · long multiplication','P5 · ratio','P5 · percentages','P5–P6 · pre-algebra','P6 + a taste of SASMO / geometry','Competition heuristics (SASMO / Math Kangaroo)','The quantitative spike — algebra · geometry · logic · proof (AMC 8 entry)'];return map[li]||'Sarah maths';}
 
 /* ---------- MATHS · MIRAYAH ---------- */
 function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans=[];
