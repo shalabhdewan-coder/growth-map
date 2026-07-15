@@ -459,11 +459,12 @@ function bookPanel(gk){const st=BOOK[gk];let h='<div class="bookzone"><div class
    ============================================================ */
 
 /* ---------- MATHS · SARAH ---------- */
-function m_warm(L){let items=[],a=[];for(let i=0;i<6;i++){const n=i+1,pick=R(0,2);
-  if(L.frac&&pick===0){const d=P([2,3,4,5]),k=R(2,7),whole=d*k,num=R(1,d-1);items.push(n+')  '+num+'/'+d+' of '+whole+' = ____');a.push(num*k);}
-  else if(L.longmul&&pick===0){const x=R(12,29),y=R(11,19);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
-  else if(L.mul2&&pick===0){const x=R(11,29),y=R(3,9);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
-  else if(pick===1){const b=R(3,12),q=R(3,12);items.push(n+')  '+(b*q)+' ÷ '+b+' = ____');a.push(q);}
+function m_warm(L){let items=[],a=[];const specials=[];if(L.frac)specials.push('frac');if(L.longmul)specials.push('longmul');if(L.mul2)specials.push('mul2');
+ for(let i=0;i<6;i++){const n=i+1,pick=R(0,2);const kind=(pick===0&&specials.length)?P(specials):(pick===1?'div':'mul');
+  if(kind==='frac'){const d=P([2,3,4,5]),k=R(2,7),whole=d*k,num=R(1,d-1);items.push(n+')  '+num+'/'+d+' of '+whole+' = ____');a.push(num*k);}
+  else if(kind==='longmul'){const x=R(12,29),y=R(11,19);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
+  else if(kind==='mul2'){const x=R(11,29),y=R(3,9);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
+  else if(kind==='div'){const b=R(3,12),q=R(3,12);items.push(n+')  '+(b*q)+' ÷ '+b+' = ____');a.push(q);}
   else{const x=R(3,12),y=R(3,12);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
  }return{items,a};}
 
