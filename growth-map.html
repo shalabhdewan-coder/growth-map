@@ -505,7 +505,11 @@ function m_mistake(L){const easy=[
   ['A child wrote:  “Half of 30 is 20.”  Explain the mistake and give the right answer.','half of 30 is 15'],
   ['A child wrote:  120 ÷ 4 = 30, so 120 ÷ 8 = 60.  What went wrong?','÷8 should be smaller: 120 ÷ 8 = 15'],
   ['A child wrote:  “3/4 is smaller than 2/4 because 3 comes after 2… wait.”  Which is bigger and why?','3/4 is bigger — more quarters']];
- const bank=(L.chal>=3)?hard:easy;const m=P(bank);return{h:'E. Find the mistake (be the teacher)',items:[m[0]],write:2,a:'E: '+m[1]};}
+ const fracEasy=[
+  ['A child wrote:  “1/4 is bigger than 1/2, because 4 is bigger than 2.”  Is this right? Explain and give the correct comparison.','wrong — 1/2 is bigger; the more pieces a whole is cut into, the smaller each piece is']];
+ let bank=(L.chal>=3)?hard:easy;
+ if(L.frac&&L.chal<3)bank=bank.concat(fracEasy);
+ const m=P(bank);return{h:'E. Find the mistake (be the teacher)',items:[m[0]],write:2,a:'E: '+m[1]};}
 
 const CHAL={
  1:[['⭐ There are 4 red and 3 blue marbles in a bag. How many marbles altogether? Draw them.','7'],
