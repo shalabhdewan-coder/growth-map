@@ -480,14 +480,15 @@ function m_words(L){const B=[],a=[];let idx=0;const num=()=>P(NAMES);const fmt=p
  else if(L.frac){const d=P([3,4,5]),k=R(3,8),whole=d*k,num2=R(1,d-1),got=num2*k;B.push((++idx)+')  A class has '+whole+' children. '+num2+'/'+d+' of them walk to school. How many walk, and how many do not?');a.push(got+' walk, '+(whole-got)+' do not');}
  else if(L.dec){const r1=R(2,9),p1=R(1,9)*5,r2=R(2,9),p2=R(1,9)*5;const t=(r1*100+p1)+(r2*100+p2);B.push((++idx)+')  '+num()+' buys milk for ₹'+r1+'.'+String(p1).padStart(2,'0')+' and bread for ₹'+r2+'.'+String(p2).padStart(2,'0')+'. What is the total?');a.push('₹'+Math.floor(t/100)+'.'+String(t%100).padStart(2,'0'));}
  else if(L.algebra>=2){const v1=R(3,9),v2=R(3,9),v3=R(3,9),v4=R(3,9),mx=Math.max(v1,v2,v3,v4),M=R(mx+6,mx+35),vBig=5*M-(v1+v2+v3+v4);const sorted=[v1,v2,v3,v4,vBig].slice().sort((p,q)=>p-q),med=sorted[2],who=num();B.push((++idx)+')  '+who+' is the oldest of 5 cousins and has collected '+vBig+' trading cards. '+who+'’s 4 younger cousins have collected '+v1+', '+v2+', '+v3+' and '+v4+' cards. For all 5 cousins together, which is greater — the mean (average) or the median — and by how many cards?');a.push('mean = '+M+' cards, median = '+med+' cards → mean is greater by '+(M-med)+' cards');}
+ else if(L.algebra>=1){const who=num(),m=R(2,6),c=R(2,15),x=R(3,15),result=m*x+c;B.push((++idx)+')  '+who+' thinks of a number, multiplies it by '+m+', then adds '+c+'. The answer is '+result+'. What number did '+who+' think of?');a.push('number = '+x);}
  // 2) a steps-based problem (2 or 3 step)
  if(L.s>=3&&L.dec){const perP=R(2,19)*5,g=R(3,5),remP=perP*g,s1P=R(2,19)*5,s2P=R(2,19)*5,totP=remP+s1P+s2P,who=num();B.push((++idx)+')  '+who+' has ₹'+fmt(totP)+'. '+who+' buys a pencil for ₹'+fmt(s1P)+' and a rubber for ₹'+fmt(s2P)+', then splits what is left equally among '+g+' friends. How much does each friend get?');a.push('₹'+fmt(perP)+' each');}
- else if(L.s>=3){const per=R(3,7),g=R(3,5),rest=per*g,m=R(4,15),n=R(4,15),S=rest+m+n;B.push((++idx)+')  A shop starts with '+S+' stickers. It sells '+m+' in the morning and '+n+' in the afternoon, then packs the rest equally into '+g+' boxes. How many stickers per box?');a.push(per+' per box');}
+ else if(L.s>=3){const per=L.longmul?R(6,15):R(3,7),g=R(3,5),rest=per*g,m=L.longmul?R(10,40):R(4,15),n=L.longmul?R(10,40):R(4,15),S=rest+m+n;B.push((++idx)+')  A shop starts with '+S+' stickers. It sells '+m+' in the morning and '+n+' in the afternoon, then packs the rest equally into '+g+' boxes. How many stickers per box?');a.push(per+' per box');}
  else if(R(0,1)===0){const p=L.mul2?R(11,18):R(4,8),q=L.mul2?R(6,12):R(4,9),give=R(3,p*q-2);B.push((++idx)+')  '+num()+' buys '+p+' packets of stickers with '+q+' in each, then gives '+give+' away. How many are left?');a.push(p*q-give);}
  else{const g=L.mul2?R(4,8):R(2,6),share=L.mul2?R(7,15):R(3,9),T=g*share,n=R(1,g-1);B.push((++idx)+')  '+num()+' shares '+T+' mangoes equally among '+g+' friends. If '+n+' of the friends eat their whole share, how many mangoes have been eaten in total?');a.push((share*n)+' mangoes eaten ('+share+' each)');}
  // 3) a change / division problem
  if(L.dec){const cP=R(15,95),cnt=R(3,6),totP=cP*cnt,payP=Math.ceil((totP+R(50,400))/100)*100;B.push((++idx)+')  Pencils cost ₹'+fmt(cP)+' each. '+num()+' buys '+cnt+' and pays with a ₹'+(payP/100)+' note. How much change?');a.push('₹'+fmt(payP-totP));}
- else{const c=L.mul2?R(15,45):R(6,19),cnt=L.mul2?R(4,8):R(3,6),tot=c*cnt,pay=Math.ceil((tot+R(5,40))/10)*10;B.push((++idx)+')  Pens cost ₹'+c+' each. '+num()+' buys '+cnt+' and pays with a ₹'+pay+' note. How much change?');a.push('₹'+(pay-tot));}
+ else{const big=L.mul2||L.longmul,c=big?R(15,45):R(6,19),cnt=big?R(4,8):R(3,6),tot=c*cnt,pay=Math.ceil((tot+R(5,40))/10)*10;B.push((++idx)+')  Pens cost ₹'+c+' each. '+num()+' buys '+cnt+' and pays with a ₹'+pay+' note. How much change?');a.push('₹'+(pay-tot));}
  return{items:B,a};}
 
 function m_bar(L){const t=L.bar||'cmp';const fmtB=p=>Math.floor(p/100)+'.'+String(p%100).padStart(2,'0');
@@ -522,11 +523,15 @@ function m_mistake(L){const easy=[
   ['A recipe for 3 people uses 6 spoons of sugar. A child wrote: “For 6 people (double the people) you need 6 + 3 = 9 spoons.”  Find the mistake and give the correct amount.','wrong — ratios scale by multiplying, not adding; double the people means double the sugar: 12 spoons']];
  const pctBank=[
   ['A child wrote:  “25% of 60 = 60 − 25 = 35.”  Is this right? Explain the mistake and give the correct answer.','wrong — 25% of 60 = 15 (find a quarter of 60; do not subtract 25)']];
+ const algebraBank=[
+  ['A child wrote:  ▢ + 6 = 15, so ▢ = 15 + 6 = 21.  Find the mistake and fix it.','wrong — to undo “+6” you subtract 6, not add: ▢ = 15 − 6 = 9'],
+  ['A child wrote:  3x = 21, so x = 21 + 3 = 24.  Find the mistake and fix it.','wrong — to undo “×3” you divide by 3, not add: x = 21 ÷ 3 = 7']];
  let bank=(L.chal>=3)?hard:easy;
  if(L.frac&&L.chal<3)bank=bank.concat(fracEasy);
  if(L.dec)bank=bank.concat(decBank);
  if(L.ratio)bank=bank.concat(ratioBank);
  if(L.pct)bank=bank.concat(pctBank);
+ if(L.algebra>=1)bank=bank.concat(algebraBank);
  const m=P(bank);return{h:'E. Find the mistake (be the teacher)',items:[m[0]],write:2,a:'E: '+m[1]};}
 
 const CHAL={
