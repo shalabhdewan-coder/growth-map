@@ -178,7 +178,7 @@ const LEVELS={
    {n:'Bigger numbers',         wm:12, mul2:1,      s:2, bar:'cmp',  patt:'arith', chal:1},
    {n:'Three-step problems',    wm:12, mul2:1,      s:3, bar:'cmp',  patt:'geo',   chal:2},
    {n:'Fractions begin',        wm:12, mul2:1, frac:1, s:3, bar:'frac', patt:'geo', chal:2},
-   {n:'Decimals & money',       wm:12, mul2:1, dec:1,  s:3, bar:'cmp',  patt:'geo', chal:3},
+   {n:'Decimals & money',       wm:12, mul2:1, dec:1,  s:3, bar:'dec',  patt:'geo', chal:3},
    {n:'Multiplication mastery', longmul:1, frac:1,   s:3, bar:'frac', patt:'tri',  chal:3},
    {n:'Ratio & proportion',     longmul:1, ratio:1,  s:3, bar:'ratio',patt:'seq',  chal:3},
    {n:'Percentages',            longmul:1, pct:1,    s:3, bar:'pct',  patt:'seq',  chal:4},
@@ -459,16 +459,19 @@ function bookPanel(gk){const st=BOOK[gk];let h='<div class="bookzone"><div class
    ============================================================ */
 
 /* ---------- MATHS · SARAH ---------- */
-function m_warm(L){let items=[],a=[];const specials=[];if(L.frac)specials.push('frac');if(L.longmul)specials.push('longmul');if(L.mul2)specials.push('mul2');
+function m_warm(L){let items=[],a=[];const specials=[];if(L.frac)specials.push('frac');if(L.longmul)specials.push('longmul');if(L.mul2)specials.push('mul2');if(L.dec)specials.push('dec');
  for(let i=0;i<6;i++){const n=i+1,pick=R(0,2);const kind=(pick===0&&specials.length)?P(specials):(pick===1?'div':'mul');
   if(kind==='frac'){const d=P([2,3,4,5]),k=R(2,7),whole=d*k,num=R(1,d-1);items.push(n+')  '+num+'/'+d+' of '+whole+' = ____');a.push(num*k);}
   else if(kind==='longmul'){const x=R(12,29),y=R(11,19);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
   else if(kind==='mul2'){const x=R(11,29),y=R(3,9);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
+  else if(kind==='dec'){const t1=R(11,99),t2=R(11,99),isAdd=R(0,1)===0,fmt=t=>Math.floor(t/10)+'.'+(t%10);
+   if(isAdd){items.push(n+')  '+fmt(t1)+' + '+fmt(t2)+' = ____');a.push(fmt(t1+t2));}
+   else{const hi=Math.max(t1,t2),lo=Math.min(t1,t2);items.push(n+')  '+fmt(hi)+' − '+fmt(lo)+' = ____');a.push(fmt(hi-lo));}}
   else if(kind==='div'){const b=R(3,12),q=R(3,12);items.push(n+')  '+(b*q)+' ÷ '+b+' = ____');a.push(q);}
   else{const x=R(3,12),y=R(3,12);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
  }return{items,a};}
 
-function m_words(L){const B=[],a=[];let idx=0;const num=()=>P(NAMES);
+function m_words(L){const B=[],a=[];let idx=0;const num=()=>P(NAMES);const fmt=p=>Math.floor(p/100)+'.'+String(p%100).padStart(2,'0');
  // 1) special problem driven by the level's headline skill
  if(L.pct){const O=R(2,9)*10,pc=P([10,20,50]),paid=O*(100-pc)/100;B.push((++idx)+')  A '+P(['bag','book','toy','game'])+' costs ₹'+O+'. In a sale it is '+pc+'% off. What is the sale price, and how much is saved?');a.push('pays ₹'+paid+', saves ₹'+(O-paid));}
  else if(L.ratio){const k=R(2,7),x=P([2,3,4]),y=P([3,5]),tot=(x+y)*k;B.push((++idx)+')  '+num()+' shares ₹'+tot+' with a friend in the ratio '+x+':'+y+'. How much does each get?');a.push('₹'+(x*k)+' and ₹'+(y*k));}
@@ -476,14 +479,17 @@ function m_words(L){const B=[],a=[];let idx=0;const num=()=>P(NAMES);
  else if(L.dec){const r1=R(2,9),p1=R(1,9)*5,r2=R(2,9),p2=R(1,9)*5;const t=(r1*100+p1)+(r2*100+p2);B.push((++idx)+')  '+num()+' buys milk for ₹'+r1+'.'+String(p1).padStart(2,'0')+' and bread for ₹'+r2+'.'+String(p2).padStart(2,'0')+'. What is the total?');a.push('₹'+Math.floor(t/100)+'.'+String(t%100).padStart(2,'0'));}
  else if(L.algebra>=2){const v1=R(3,9),v2=R(3,9),v3=R(3,9),v4=R(3,9),mx=Math.max(v1,v2,v3,v4),M=R(mx+6,mx+35),vBig=5*M-(v1+v2+v3+v4);const sorted=[v1,v2,v3,v4,vBig].slice().sort((p,q)=>p-q),med=sorted[2],who=num();B.push((++idx)+')  '+who+' is the oldest of 5 cousins and has collected '+vBig+' trading cards. '+who+'’s 4 younger cousins have collected '+v1+', '+v2+', '+v3+' and '+v4+' cards. For all 5 cousins together, which is greater — the mean (average) or the median — and by how many cards?');a.push('mean = '+M+' cards, median = '+med+' cards → mean is greater by '+(M-med)+' cards');}
  // 2) a steps-based problem (2 or 3 step)
- if(L.s>=3){const per=R(3,7),g=R(3,5),rest=per*g,m=R(4,15),n=R(4,15),S=rest+m+n;B.push((++idx)+')  A shop starts with '+S+' stickers. It sells '+m+' in the morning and '+n+' in the afternoon, then packs the rest equally into '+g+' boxes. How many stickers per box?');a.push(per+' per box');}
+ if(L.s>=3&&L.dec){const perP=R(2,19)*5,g=R(3,5),remP=perP*g,s1P=R(2,19)*5,s2P=R(2,19)*5,totP=remP+s1P+s2P,who=num();B.push((++idx)+')  '+who+' has ₹'+fmt(totP)+'. '+who+' buys a pencil for ₹'+fmt(s1P)+' and a rubber for ₹'+fmt(s2P)+', then splits what is left equally among '+g+' friends. How much does each friend get?');a.push('₹'+fmt(perP)+' each');}
+ else if(L.s>=3){const per=R(3,7),g=R(3,5),rest=per*g,m=R(4,15),n=R(4,15),S=rest+m+n;B.push((++idx)+')  A shop starts with '+S+' stickers. It sells '+m+' in the morning and '+n+' in the afternoon, then packs the rest equally into '+g+' boxes. How many stickers per box?');a.push(per+' per box');}
  else if(R(0,1)===0){const p=L.mul2?R(11,18):R(4,8),q=L.mul2?R(6,12):R(4,9),give=R(3,p*q-2);B.push((++idx)+')  '+num()+' buys '+p+' packets of stickers with '+q+' in each, then gives '+give+' away. How many are left?');a.push(p*q-give);}
  else{const g=L.mul2?R(4,8):R(2,6),share=L.mul2?R(7,15):R(3,9),T=g*share,n=R(1,g-1);B.push((++idx)+')  '+num()+' shares '+T+' mangoes equally among '+g+' friends. If '+n+' of the friends eat their whole share, how many mangoes have been eaten in total?');a.push((share*n)+' mangoes eaten ('+share+' each)');}
  // 3) a change / division problem
- {const c=L.mul2?R(15,45):R(6,19),cnt=L.mul2?R(4,8):R(3,6),tot=c*cnt,pay=Math.ceil((tot+R(5,40))/10)*10;B.push((++idx)+')  Pens cost ₹'+c+' each. '+num()+' buys '+cnt+' and pays with a ₹'+pay+' note. How much change?');a.push('₹'+(pay-tot));}
+ if(L.dec){const cP=R(15,95),cnt=R(3,6),totP=cP*cnt,payP=Math.ceil((totP+R(50,400))/100)*100;B.push((++idx)+')  Pencils cost ₹'+fmt(cP)+' each. '+num()+' buys '+cnt+' and pays with a ₹'+(payP/100)+' note. How much change?');a.push('₹'+fmt(payP-totP));}
+ else{const c=L.mul2?R(15,45):R(6,19),cnt=L.mul2?R(4,8):R(3,6),tot=c*cnt,pay=Math.ceil((tot+R(5,40))/10)*10;B.push((++idx)+')  Pens cost ₹'+c+' each. '+num()+' buys '+cnt+' and pays with a ₹'+pay+' note. How much change?');a.push('₹'+(pay-tot));}
  return{items:B,a};}
 
-function m_bar(L){const t=L.bar||'cmp';
+function m_bar(L){const t=L.bar||'cmp';const fmtB=p=>Math.floor(p/100)+'.'+String(p%100).padStart(2,'0');
+ if(t==='dec'){const aP=R(3,18)*5,bP=R(3,18)*5,totP=aP+bP;return{h:'C. Bar-model challenge — draw the bars',items:[P(NAMES)+' spent ₹'+fmtB(totP)+' in total on a toy and a comic. The toy cost ₹'+fmtB(aP)+'. Draw a bar split into two parts to find how much the comic cost.'],write:3,a:'C: ₹'+fmtB(bP)};}
  if(t==='frac'){const d=P([3,4,5]),k=R(3,7),whole=d*k,num=R(1,d-1),got=num*k;return{h:'C. Bar-model challenge — draw the bars',items:[num+'/'+d+' of a number is '+got+'. Draw a bar in '+d+' equal parts to find the whole number.'],write:3,a:'C: whole = '+whole};}
  if(t==='ratio'){const k=R(2,6),x=P([2,3]),y=P([3,4,5]),tot=(x+y)*k;return{h:'C. Bar-model challenge — draw the bars',items:['Two teams share '+tot+' points in the ratio '+x+':'+y+'. Draw '+(x+y)+' equal boxes to find each team’s score.'],write:3,a:'C: '+(x*k)+' and '+(y*k)};}
  if(t==='pct'){const O=R(3,9)*10,pc=P([20,25,50]);const paid=O*(100-pc)/100;return{h:'C. Bar-model challenge — draw the bars',items:['After a '+pc+'% discount a jacket costs ₹'+paid+'. Draw a bar split into 100 to find the original price.'],write:3,a:'C: original = ₹'+O};}
@@ -507,8 +513,12 @@ function m_mistake(L){const easy=[
   ['A child wrote:  “3/4 is smaller than 2/4 because 3 comes after 2… wait.”  Which is bigger and why?','3/4 is bigger — more quarters']];
  const fracEasy=[
   ['A child wrote:  “1/4 is bigger than 1/2, because 4 is bigger than 2.”  Is this right? Explain and give the correct comparison.','wrong — 1/2 is bigger; the more pieces a whole is cut into, the smaller each piece is']];
+ const decBank=[
+  ['A child wrote:  “0.7 is smaller than 0.65, because 7 is a smaller number than 65.”  Is this right? Explain and give the correct comparison.','wrong — 0.70 is bigger than 0.65; line up the decimal point and compare the tenths digit first (7 tenths > 6 tenths)'],
+  ['A child wrote:  0.5 + 0.5 = 0.10.  Find the mistake and give the correct answer.','wrong → 0.5 + 0.5 = 1.0 (one whole)']];
  let bank=(L.chal>=3)?hard:easy;
  if(L.frac&&L.chal<3)bank=bank.concat(fracEasy);
+ if(L.dec)bank=bank.concat(decBank);
  const m=P(bank);return{h:'E. Find the mistake (be the teacher)',items:[m[0]],write:2,a:'E: '+m[1]};}
 
 const CHAL={
