@@ -184,8 +184,8 @@ const LEVELS={
    {n:'Percentages',            longmul:1, pct:1,    s:3, bar:'pct',  patt:'seq',  chal:4},
    {n:'Pre-algebra',            longmul:1, algebra:1,s:3, bar:'ratio',patt:'seq',  chal:4},
    {n:'Algebra & geometry',     longmul:1, algebra:2, geom:1,   s:3, bar:'pct',  patt:'quad', chal:5},
-   {n:'Competition heuristics', algebra:2, geom:1, comp:1, s:3, bar:'ratio', patt:'quad', chal:5},
-   {n:'The quantitative spike', algebra:2, geom:1, comp:1, proof:1, logic:1, s:3, bar:'pct', patt:'quad', chal:6}
+   {n:'Competition heuristics', longmul:1, algebra:3, geom:1, comp:1, s:3, bar:'ratio3', patt:'quad', chal:5},
+   {n:'The quantitative spike', longmul:1, algebra:3, geom:1, comp:1, proof:1, logic:1, s:3, bar:'pct', patt:'quad', chal:6}
   ],
   english:[
    {n:'Comprehension',        vt:'easy',  pt:1, gt:'easy', gc:4, write:'para'},
@@ -495,6 +495,7 @@ function m_bar(L){const t=L.bar||'cmp';const fmtB=p=>Math.floor(p/100)+'.'+Strin
  if(t==='dec'){const aP=R(3,18)*5,bP=R(3,18)*5,totP=aP+bP;return{h:'C. Bar-model challenge — draw the bars',items:[P(NAMES)+' spent ₹'+fmtB(totP)+' in total on a toy and a comic. The toy cost ₹'+fmtB(aP)+'. Draw a bar split into two parts to find how much the comic cost.'],write:3,a:'C: ₹'+fmtB(bP)};}
  if(t==='frac'){const d=P([3,4,5]),k=R(3,7),whole=d*k,num=R(1,d-1),got=num*k;return{h:'C. Bar-model challenge — draw the bars',items:[num+'/'+d+' of a number is '+got+'. Draw a bar in '+d+' equal parts to find the whole number.'],write:3,a:'C: whole = '+whole};}
  if(t==='ratio'){const k=R(2,6),x=P([2,3]),y=P([3,4,5]),tot=(x+y)*k;return{h:'C. Bar-model challenge — draw the bars',items:['Two teams share '+tot+' points in the ratio '+x+':'+y+'. Draw '+(x+y)+' equal boxes to find each team’s score.'],write:3,a:'C: '+(x*k)+' and '+(y*k)};}
+ if(t==='ratio3'){const k=R(2,5),x=P([1,2]),y=P([2,3]),z=P([3,4]),tot=(x+y+z)*k;return{h:'C. Bar-model challenge — draw the bars',items:['Three friends share ₹'+tot+' in the ratio '+x+':'+y+':'+z+'. Draw '+(x+y+z)+' equal boxes to find each friend’s share.'],write:3,a:'C: ₹'+(x*k)+', ₹'+(y*k)+' and ₹'+(z*k)};}
  if(t==='pct'){const O=R(3,9)*10,pc=P([20,25,50]);const paid=O*(100-pc)/100;return{h:'C. Bar-model challenge — draw the bars',items:['After a '+pc+'% discount a jacket costs ₹'+paid+'. Draw a bar split into 100 to find the original price.'],write:3,a:'C: original = ₹'+O};}
  const tot=(L.mul2?R(20,40):R(8,15))*2,d=(L.mul2?R(5,12):R(2,7))*2,big=(tot+d)/2,sm=(tot-d)/2;return{h:'C. Bar-model challenge — draw the bars',items:['Two friends share '+tot+' stickers. One has '+d+' more than the other. How many does each have?'],write:3,a:'C: '+big+' and '+sm};}
 
@@ -552,7 +553,10 @@ const CHAL={
     ['⭐ A square is cut by 2 straight lines. What is the greatest number of pieces?','4']],
  6:[['⭐ Find the smallest number that leaves remainder 1 when divided by 2, 3, 4, 5 and 6.','61'],
     ['⭐ In how many ways can you make ₹10 using ₹1, ₹2 and ₹5 coins?','10 ways'],
-    ['⭐ The angles of a triangle are in the ratio 1:2:3. Find each angle.','30°, 60°, 90°']]
+    ['⭐ The angles of a triangle are in the ratio 1:2:3. Find each angle.','30°, 60°, 90°']],
+ comp:[['⭐ A number between 30 and 50 leaves remainder 2 when divided by 5, and remainder 1 when divided by 4. What is the number?','37'],
+    ['⭐ The sum of 9 consecutive whole numbers is 108. What is the largest of the nine numbers?','16  (numbers are 8–16)'],
+    ['⭐ A student was asked to add 7 to a number, then multiply the result by 3. Instead, they multiplied the number by 3 first, then added 7 — and got 46. What should the correct answer have been?','60  (the number was 13; correct: (13+7)×3=60)']]
 };
 
 function m_algebra(L){const B=[],a=[];
@@ -604,7 +608,8 @@ function ws_maths_sarah(li){const L=LEVELS.sarah.maths[li];let blocks=[],ans=[];
  if(L.algebra){const al=m_algebra(L);blocks.push({h:al.h,items:al.items,write:al.write});ans.push(al.a);}
  if(L.geom){const ge=m_geometry(L);blocks.push({h:ge.h,items:ge.items,write:ge.write});ans.push(ge.a);}
  if(L.logic){const lg=m_logic(L);blocks.push({h:lg.h,items:lg.items,write:lg.write});ans.push(lg.a);}
- const ch=P(CHAL[L.chal]||CHAL[3]);blocks.push({h:'★ Challenge — think hard, take your time'+(L.comp?' (competition-style)':''),items:[ch[0]],write:4});ans.push('★: '+ch[1]);
+ let chalPool=CHAL[L.chal]||CHAL[3];if(L.comp&&CHAL.comp)chalPool=chalPool.concat(CHAL.comp);
+ const ch=P(chalPool);blocks.push({h:'★ Challenge — think hard, take your time'+(L.comp?' (competition-style)':''),items:[ch[0]],write:4});ans.push('★: '+ch[1]);
  if(L.proof){blocks.push({h:'★★ Prove it',items:['Explain, in your own words and with an example, WHY the challenge answer above must be true.'],write:4});ans.push('★★: reward a clear reason + a worked example.');}
  return{title:'Maths Worksheet — Sarah (8)',sub:'Level '+(li+1)+'/'+LEVELS.sarah.maths.length+' · '+L.n,level:mLevelTag(li),blocks,ans};}
 function mLevelTag(li){const map=['Singapore P3 · fluency + 2-step','Singapore P3+ · larger numbers','Singapore P3–P4 · 3-step','P4 · fractions of a quantity','P4 · decimals & money','P4–P5 · long multiplication','P5 · ratio','P5 · percentages','P5–P6 · pre-algebra (bridge)','Lower-secondary · algebra & geometry (Math Kangaroo Benjamin)','Competition heuristics (Benjamin upper / SASMO upper)','The quantitative spike — algebra · geometry · logic · proof (AMC 8 entry)'];return map[li]||'Sarah maths';}
