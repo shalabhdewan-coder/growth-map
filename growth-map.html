@@ -459,7 +459,7 @@ function bookPanel(gk){const st=BOOK[gk];let h='<div class="bookzone"><div class
    ============================================================ */
 
 /* ---------- MATHS · SARAH ---------- */
-function m_warm(L){let items=[],a=[];const specials=[];if(L.frac)specials.push('frac');if(L.longmul)specials.push('longmul');if(L.mul2)specials.push('mul2');if(L.dec)specials.push('dec');
+function m_warm(L){let items=[],a=[];const specials=[];if(L.frac)specials.push('frac');if(L.longmul)specials.push('longmul');if(L.mul2)specials.push('mul2');if(L.dec)specials.push('dec');if(L.ratio)specials.push('ratio');
  for(let i=0;i<6;i++){const n=i+1,pick=R(0,2);const kind=(pick===0&&specials.length)?P(specials):(pick===1?'div':'mul');
   if(kind==='frac'){const d=P([2,3,4,5]),k=R(2,7),whole=d*k,num=R(1,d-1);items.push(n+')  '+num+'/'+d+' of '+whole+' = ____');a.push(num*k);}
   else if(kind==='longmul'){const x=R(12,29),y=R(11,19);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
@@ -467,6 +467,7 @@ function m_warm(L){let items=[],a=[];const specials=[];if(L.frac)specials.push('
   else if(kind==='dec'){const t1=R(11,99),t2=R(11,99),isAdd=R(0,1)===0,fmt=t=>Math.floor(t/10)+'.'+(t%10);
    if(isAdd){items.push(n+')  '+fmt(t1)+' + '+fmt(t2)+' = ____');a.push(fmt(t1+t2));}
    else{const hi=Math.max(t1,t2),lo=Math.min(t1,t2);items.push(n+')  '+fmt(hi)+' − '+fmt(lo)+' = ____');a.push(fmt(hi-lo));}}
+  else if(kind==='ratio'){const x=P([2,3,4]),y=P(x===3?[5,7]:[3,5,7]),k=R(2,6);items.push(n+')  '+(x*k)+' : '+(y*k)+'  in simplest form = ____ : ____');a.push(x+':'+y);}
   else if(kind==='div'){const b=R(3,12),q=R(3,12);items.push(n+')  '+(b*q)+' ÷ '+b+' = ____');a.push(q);}
   else{const x=R(3,12),y=R(3,12);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
  }return{items,a};}
@@ -516,9 +517,12 @@ function m_mistake(L){const easy=[
  const decBank=[
   ['A child wrote:  “0.7 is smaller than 0.65, because 7 is a smaller number than 65.”  Is this right? Explain and give the correct comparison.','wrong — 0.70 is bigger than 0.65; line up the decimal point and compare the tenths digit first (7 tenths > 6 tenths)'],
   ['A child wrote:  0.5 + 0.5 = 0.10.  Find the mistake and give the correct answer.','wrong → 0.5 + 0.5 = 1.0 (one whole)']];
+ const ratioBank=[
+  ['A recipe for 3 people uses 6 spoons of sugar. A child wrote: “For 6 people (double the people) you need 6 + 3 = 9 spoons.”  Find the mistake and give the correct amount.','wrong — ratios scale by multiplying, not adding; double the people means double the sugar: 12 spoons']];
  let bank=(L.chal>=3)?hard:easy;
  if(L.frac&&L.chal<3)bank=bank.concat(fracEasy);
  if(L.dec)bank=bank.concat(decBank);
+ if(L.ratio)bank=bank.concat(ratioBank);
  const m=P(bank);return{h:'E. Find the mistake (be the teacher)',items:[m[0]],write:2,a:'E: '+m[1]};}
 
 const CHAL={
