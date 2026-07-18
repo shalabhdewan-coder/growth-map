@@ -477,24 +477,24 @@ function m_words(L){const B=[],a=[];let idx=0;const num=()=>P(NAMES);
  else if(L.algebra>=2){const v1=R(3,9),v2=R(3,9),v3=R(3,9),v4=R(3,9),mx=Math.max(v1,v2,v3,v4),M=R(mx+6,mx+35),vBig=5*M-(v1+v2+v3+v4);const sorted=[v1,v2,v3,v4,vBig].slice().sort((p,q)=>p-q),med=sorted[2],who=num();B.push((++idx)+')  '+who+' is the oldest of 5 cousins and has collected '+vBig+' trading cards. '+who+'’s 4 younger cousins have collected '+v1+', '+v2+', '+v3+' and '+v4+' cards. For all 5 cousins together, which is greater — the mean (average) or the median — and by how many cards?');a.push('mean = '+M+' cards, median = '+med+' cards → mean is greater by '+(M-med)+' cards');}
  // 2) a steps-based problem (2 or 3 step)
  if(L.s>=3){const per=R(3,7),g=R(3,5),rest=per*g,m=R(4,15),n=R(4,15),S=rest+m+n;B.push((++idx)+')  A shop starts with '+S+' stickers. It sells '+m+' in the morning and '+n+' in the afternoon, then packs the rest equally into '+g+' boxes. How many stickers per box?');a.push(per+' per box');}
- else if(R(0,1)===0){const p=R(4,8),q=R(4,9),give=R(3,p*q-2);B.push((++idx)+')  '+num()+' buys '+p+' packets of stickers with '+q+' in each, then gives '+give+' away. How many are left?');a.push(p*q-give);}
- else{const g=R(2,6),share=R(3,9),T=g*share,n=R(1,g-1);B.push((++idx)+')  '+num()+' shares '+T+' mangoes equally among '+g+' friends. If '+n+' of the friends eat their whole share, how many mangoes have been eaten in total?');a.push((share*n)+' mangoes eaten ('+share+' each)');}
+ else if(R(0,1)===0){const p=L.mul2?R(11,18):R(4,8),q=L.mul2?R(6,12):R(4,9),give=R(3,p*q-2);B.push((++idx)+')  '+num()+' buys '+p+' packets of stickers with '+q+' in each, then gives '+give+' away. How many are left?');a.push(p*q-give);}
+ else{const g=L.mul2?R(4,8):R(2,6),share=L.mul2?R(7,15):R(3,9),T=g*share,n=R(1,g-1);B.push((++idx)+')  '+num()+' shares '+T+' mangoes equally among '+g+' friends. If '+n+' of the friends eat their whole share, how many mangoes have been eaten in total?');a.push((share*n)+' mangoes eaten ('+share+' each)');}
  // 3) a change / division problem
- {const c=R(6,19),cnt=R(3,6),tot=c*cnt,pay=Math.ceil((tot+R(5,40))/10)*10;B.push((++idx)+')  Pens cost ₹'+c+' each. '+num()+' buys '+cnt+' and pays with a ₹'+pay+' note. How much change?');a.push('₹'+(pay-tot));}
+ {const c=L.mul2?R(15,45):R(6,19),cnt=L.mul2?R(4,8):R(3,6),tot=c*cnt,pay=Math.ceil((tot+R(5,40))/10)*10;B.push((++idx)+')  Pens cost ₹'+c+' each. '+num()+' buys '+cnt+' and pays with a ₹'+pay+' note. How much change?');a.push('₹'+(pay-tot));}
  return{items:B,a};}
 
 function m_bar(L){const t=L.bar||'cmp';
  if(t==='frac'){const d=P([3,4,5]),k=R(3,7),whole=d*k,num=R(1,d-1),got=num*k;return{h:'C. Bar-model challenge — draw the bars',items:[num+'/'+d+' of a number is '+got+'. Draw a bar in '+d+' equal parts to find the whole number.'],write:3,a:'C: whole = '+whole};}
  if(t==='ratio'){const k=R(2,6),x=P([2,3]),y=P([3,4,5]),tot=(x+y)*k;return{h:'C. Bar-model challenge — draw the bars',items:['Two teams share '+tot+' points in the ratio '+x+':'+y+'. Draw '+(x+y)+' equal boxes to find each team’s score.'],write:3,a:'C: '+(x*k)+' and '+(y*k)};}
  if(t==='pct'){const O=R(3,9)*10,pc=P([20,25,50]);const paid=O*(100-pc)/100;return{h:'C. Bar-model challenge — draw the bars',items:['After a '+pc+'% discount a jacket costs ₹'+paid+'. Draw a bar split into 100 to find the original price.'],write:3,a:'C: original = ₹'+O};}
- const tot=R(8,15)*2,d=R(2,7)*2,big=(tot+d)/2,sm=(tot-d)/2;return{h:'C. Bar-model challenge — draw the bars',items:['Two friends share '+tot+' stickers. One has '+d+' more than the other. How many does each have?'],write:3,a:'C: '+big+' and '+sm};}
+ const tot=(L.mul2?R(20,40):R(8,15))*2,d=(L.mul2?R(5,12):R(2,7))*2,big=(tot+d)/2,sm=(tot-d)/2;return{h:'C. Bar-model challenge — draw the bars',items:['Two friends share '+tot+' stickers. One has '+d+' more than the other. How many does each have?'],write:3,a:'C: '+big+' and '+sm};}
 
 function m_pattern(L){const t=L.patt||'arith';
  if(t==='geo'){const st=R(2,4),r=P([2,3]);const s=[st,st*r,st*r*r,st*r*r*r];return{seq:s,next:[s[3]*r,s[3]*r*r],rule:'multiply by '+r};}
  if(t==='tri'){const s=[1,3,6,10];return{seq:s,next:[15,21],rule:'add 1 more each time (triangular numbers)'};}
  if(t==='seq'){const b=R(1,3);const f=n=>n*n+b;const s=[f(1),f(2),f(3),f(4)];return{seq:s,next:[f(5),f(6)],rule:'square the position, then add '+b};}
  if(t==='quad'){const s=[2,6,12,20];return{seq:s,next:[30,42],rule:'n × (n+1)  →  positions 1,2,3…'};}
- const st=R(2,6),d=R(2,5);const s=[st,st+d,st+2*d,st+3*d];return{seq:s,next:[st+4*d,st+5*d],rule:'add '+d};}
+ const st=L.mul2?R(8,20):R(2,6),d=L.mul2?R(4,9):R(2,5);const s=[st,st+d,st+2*d,st+3*d];return{seq:s,next:[st+4*d,st+5*d],rule:'add '+d};}
 
 function m_mistake(L){const easy=[
   ['A child wrote:  7 × 8 = 54.  Is it right? If not, fix it and explain.','wrong → 7 × 8 = 56'],
