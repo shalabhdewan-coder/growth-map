@@ -18,7 +18,8 @@
   .tab:hover{color:var(--ink)}.tab.active{background:var(--ink);color:#0f1226;border-color:var(--ink)}
   .pane{display:none}.pane.active{display:block}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;position:relative;overflow:hidden}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;position:relative;overflow:hidden;cursor:pointer;transition:border-color .15s,transform .15s}
+  .card:hover{border-color:var(--accent);transform:translateY(-2px)}
   .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--accent)}
   .ico{font-size:22px}.ctitle{font-weight:700;font-size:15px;margin:6px 0 2px}.cnow{color:var(--muted);font-size:12px}.cnow b{color:var(--ink)}.stars{margin-top:8px;font-size:14px;color:var(--star);letter-spacing:2px}
   .subtabs{display:flex;gap:7px;flex-wrap:wrap;margin:4px 0 18px}
@@ -94,7 +95,7 @@
   </div>
   <div class="pane active" id="pane-overview">
     <div class="grid" id="overviewGrid"></div>
-    <div class="tip">Open a daughter's tab → pick a subject → press <b>✓ Done — level up</b> and the next, harder sheet appears automatically.</div>
+    <div class="tip">Tap any card to jump straight to that subject, or open a daughter's tab → pick a subject → press <b>✓ Done — level up</b> and the next, harder sheet appears automatically.</div>
   </div>
   <div class="pane" id="pane-sarah"><div class="subtabs" id="subtabs-sarah"></div><div id="content-sarah"></div></div>
   <div class="pane" id="pane-mirayah"><div class="subtabs" id="subtabs-mirayah"></div><div id="content-mirayah"></div></div>
@@ -897,9 +898,13 @@ function starStr(frac){const full=Math.max(0,Math.min(5,Math.round(frac*5)));ret
 function buildOverview(){const grid=document.getElementById('overviewGrid');let cards=[];
  for(const gk of ['sarah','mirayah']){const g=DATA[gk];
   for(const sk of Object.keys(g.subjects)){const s=g.subjects[sk],lad=LEVELS[gk][sk],li=LEVEL[gk][sk];
-   cards.push([s.accent,s.icon,s.label+' · '+g.name,'Rung '+(li+1)+'/'+lad.length+' — '+lad[li].n,(li+1)/lad.length]);
+   cards.push([s.accent,s.icon,s.label+' · '+g.name,'Rung '+(li+1)+'/'+lad.length+' — '+lad[li].n,(li+1)/lad.length,gk,sk]);
   }}
- grid.innerHTML=cards.map(r=>'<div class="card" style="--accent:'+r[0]+'"><div class="ico">'+r[1]+'</div><div class="ctitle">'+r[2]+'</div><div class="cnow">Now: <b>'+r[3]+'</b></div><div class="stars">'+starStr(r[4])+'</div></div>').join('');
+ grid.innerHTML=cards.map(r=>'<div class="card" style="--accent:'+r[0]+'" data-act="goSubject" data-gk="'+r[5]+'" data-sk="'+r[6]+'"><div class="ico">'+r[1]+'</div><div class="ctitle">'+r[2]+'</div><div class="cnow">Now: <b>'+r[3]+'</b></div><div class="stars">'+starStr(r[4])+'</div></div>').join('');
+}
+function goToSubject(gk,sk){
+ const topBtn=document.querySelector('.tab[data-pane="'+gk+'"]'); if(topBtn) topBtn.click();
+ const subBtn=document.querySelector('#subtabs-'+gk+' button[data-sk="'+sk+'"]'); if(subBtn) subBtn.click();
 }
 
 /* ===== TASK-SHEET (blank weekly grid) PRINT ===== */
@@ -926,6 +931,7 @@ document.addEventListener('click', e=>{
  else if(act==='printTasks') printTasks(gk,sk);
  else if(act==='finishBook') finishBook(gk);
  else if(act==='nextBook') nextBook(gk);
+ else if(act==='goSubject') goToSubject(gk,sk);
 });
 document.addEventListener('input', e=>{
  const t=e.target.closest('[data-bookinput]'); if(!t) return;
