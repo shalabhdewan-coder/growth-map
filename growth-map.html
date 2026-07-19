@@ -447,9 +447,9 @@ function nextTitles(gk,n){const st=BOOK[gk],L=LADDER[gk];return L.slice(st.idx+1
 function finishBook(gk){const t=(document.getElementById('bookin-'+gk).value||curBook(gk)).split(' — ')[0].trim();if(t)BOOK[gk].done.push(t);BOOK[gk].idx++;BOOK[gk].custom=null;save();renderSub(gk,'english');makeWS(gk,'english');toast('📚 Book shelved! Next book + a fresh sheet ready.');}
 function nextBook(gk){BOOK[gk].idx++;BOOK[gk].custom=null;save();renderSub(gk,'english');toast('⤳ Skipped to the next book.');}
 function bookPanel(gk){const st=BOOK[gk];let h='<div class="bookzone"><div class="sect">📖 Book I’m reading now</div>';
- h+='<input class="bookin" id="bookin-'+gk+'" value="'+curBook(gk).replace(/"/g,'&quot;')+'" oninput="BOOK[\''+gk+'\'].custom=this.value">';
- h+='<div class="bookact"><button class="btn donebtn" onclick="finishBook(\''+gk+'\')">✓ Finished this book →</button>'
-   +'<button class="btn" onclick="nextBook(\''+gk+'\')">⤳ Skip to next</button></div>';
+ h+='<input class="bookin" id="bookin-'+gk+'" value="'+curBook(gk).replace(/"/g,'&quot;')+'" data-bookinput="'+gk+'">';
+ h+='<div class="bookact"><button class="btn donebtn" data-act="finishBook" data-gk="'+gk+'">✓ Finished this book →</button>'
+   +'<button class="btn" data-act="nextBook" data-gk="'+gk+'">⤳ Skip to next</button></div>';
  const nx=nextTitles(gk,3);if(nx.length)h+='<div class="laddr">📚 Next up: '+nx.join(' · ')+'</div>';
  if(st.done.length)h+='<div class="shelf">🏆 Finished ('+st.done.length+'): '+st.done.join(' · ')+'</div>';
  h+='</div>';return h;}
@@ -850,7 +850,7 @@ function levelRail(gk,sk){const lad=LEVELS[gk][sk],here=LEVEL[gk][sk];let r='<di
 
 function panelHTML(gk,sk){const g=DATA[gk],s=g.subjects[sk];const li=LEVEL[gk][sk],lad=LEVELS[gk][sk];let h='';
  h+='<div class="ebar"><h2>'+s.icon+' '+s.label+' — '+g.name+'</h2><div class="actions">'
-  +'<button class="btn" onclick="printTasks(\''+gk+'\',\''+sk+'\')">🖨️ Task sheet</button>'
+  +'<button class="btn" data-act="printTasks" data-gk="'+gk+'" data-sk="'+sk+'">🖨️ Task sheet</button>'
   +'</div></div>';
  h+='<div class="who">Age '+g.age+' · '+s.focus+'</div><div class="progress"><i></i></div>';
  h+='<div class="sect">Every day</div>';
@@ -867,11 +867,11 @@ function panelHTML(gk,sk){const g=DATA[gk],s=g.subjects[sk];const li=LEVEL[gk][s
   +'<span class="levelbadge">📊 Level '+(li+1)+'/'+lad.length+' · '+lad[li].n+'</span></div>'
   +levelRail(gk,sk)
   +'<div class="actions" style="margin-top:12px">'
-  +'<button class="btn" style="background:'+s.accent+';border-color:'+s.accent+';color:#0f1226" onclick="makeWS(\''+gk+'\',\''+sk+'\')">'+makeLbl+'</button>'
-  +'<button class="btn donebtn" onclick="doneLevelUp(\''+gk+'\',\''+sk+'\')">✓ Done — level up →</button>'
-  +'<button class="btn stepdown" onclick="stepDown(\''+gk+'\',\''+sk+'\')" title="Too hard? step back a rung">↩︎</button>'
-  +'<button class="btn" onclick="printWS()">🖨️ Print</button>'
-  +'<button class="btn" onclick="downloadWS()">⬇️ Download</button>'
+  +'<button class="btn" style="background:'+s.accent+';border-color:'+s.accent+';color:#0f1226" data-act="makeWS" data-gk="'+gk+'" data-sk="'+sk+'">'+makeLbl+'</button>'
+  +'<button class="btn donebtn" data-act="doneLevelUp" data-gk="'+gk+'" data-sk="'+sk+'">✓ Done — level up →</button>'
+  +'<button class="btn stepdown" data-act="stepDown" data-gk="'+gk+'" data-sk="'+sk+'" title="Too hard? step back a rung">↩︎</button>'
+  +'<button class="btn" data-act="printWS">🖨️ Print</button>'
+  +'<button class="btn" data-act="downloadWS">⬇️ Download</button>'
   +'</div>'
   +'<div class="wsempty" id="wsempty-'+gk+sk+'">Press “'+makeLbl.replace(/^[^ ]+ /,'')+'” for this level’s '+noun+'. Press “✓ Done — level up” when it’s mastered — the next '+noun+' steps up.</div>'
   +'<div class="wsprev" id="wsprev-'+gk+sk+'" style="display:none"></div></div>';
@@ -913,6 +913,24 @@ function tasksSheet(gk,sk){const g=DATA[gk],s=g.subjects[sk],D=['M','T','W','T',
   +'<div class="lab">Pick 3 missions</div>'+miss
   +'<div class="note">The daily tasks matter most — protect them. Missions are a menu, not a must.</div></div>';}
 function printTasks(gk,sk){document.getElementById('printRoot').innerHTML=tasksSheet(gk,sk);window.print();}
+
+/* ===== DELEGATED ACTIONS (no inline onclick/oninput — CSP-safe) ===== */
+document.addEventListener('click', e=>{
+ const t=e.target.closest('[data-act]'); if(!t) return;
+ const gk=t.dataset.gk, sk=t.dataset.sk, act=t.dataset.act;
+ if(act==='makeWS') makeWS(gk,sk);
+ else if(act==='doneLevelUp') doneLevelUp(gk,sk);
+ else if(act==='stepDown') stepDown(gk,sk);
+ else if(act==='printWS') printWS();
+ else if(act==='downloadWS') downloadWS();
+ else if(act==='printTasks') printTasks(gk,sk);
+ else if(act==='finishBook') finishBook(gk);
+ else if(act==='nextBook') nextBook(gk);
+});
+document.addEventListener('input', e=>{
+ const t=e.target.closest('[data-bookinput]'); if(!t) return;
+ BOOK[t.dataset.bookinput].custom = t.value;
+});
 
 /* ===== TOP TABS ===== */
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
