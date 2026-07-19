@@ -409,6 +409,23 @@ const SCI_MIRAYAH=[
 Object.assign(LEVELS.sarah,   {science:SCI_SARAH});
 Object.assign(LEVELS.mirayah, {science:SCI_MIRAYAH});
 
+/* ===== LADDER EXTENSION — no rung is ever the last one =====
+   BASE_LADDER_LEN remembers how many rungs were hand-authored, captured once
+   here before any synthetic rungs get appended. Past that point, "Done" no
+   longer stops — it clones the final rung and intensifies it (see
+   intensifyRung), so the array itself just keeps growing. Every place in the
+   app that reads LEVELS[gk][sk].length / LEVELS[gk][sk][i] already works
+   unchanged against a longer array — nothing else had to change. */
+const BASE_LADDER_LEN={};
+for(const gk of ['sarah','mirayah']){BASE_LADDER_LEN[gk]={};for(const sk of Object.keys(LEVELS[gk]))BASE_LADDER_LEN[gk][sk]=LEVELS[gk][sk].length;}
+function intensifyRung(base,tier){
+ const k=Object.assign({},base),root=base._root||base.n;
+ k._root=root;k.n=root+' — Independent Study '+tier;k.boost=tier;
+ for(const key in k){if(typeof k[key]==='number'&&key!=='chal'&&key!=='boost')k[key]=Math.ceil(k[key]*(1+0.15*tier));}
+ if('chal' in k)k.chal=6; // pin to the hardest defined challenge bank rather than overshoot into an undefined one
+ return k;
+}
+
 /* ===== STATE (this is your editable starting point) ===== */
 const LEVEL={
  sarah:  {maths:5, english:3, science:3, swimming:7, music:2, riding:3, madhurim:9},
@@ -460,28 +477,28 @@ function bookPanel(gk){const st=BOOK[gk];let h='<div class="bookzone"><div class
    ============================================================ */
 
 /* ---------- MATHS · SARAH ---------- */
-function m_warm(L){let items=[],a=[];const specials=[];if(L.frac)specials.push('frac');if(L.longmul)specials.push('longmul');if(L.mul2)specials.push('mul2');if(L.dec)specials.push('dec');if(L.ratio)specials.push('ratio');if(L.pct)specials.push('pct');
+function m_warm(L){let items=[],a=[];const bo=L.boost||0;const specials=[];if(L.frac)specials.push('frac');if(L.longmul)specials.push('longmul');if(L.mul2)specials.push('mul2');if(L.dec)specials.push('dec');if(L.ratio)specials.push('ratio');if(L.pct)specials.push('pct');
  for(let i=0;i<6;i++){const n=i+1,pick=R(0,2);const kind=(pick===0&&specials.length)?P(specials):(pick===1?'div':'mul');
-  if(kind==='frac'){const d=P([2,3,4,5]),k=R(2,7),whole=d*k,num=R(1,d-1);items.push(n+')  '+num+'/'+d+' of '+whole+' = ____');a.push(num*k);}
-  else if(kind==='longmul'){const x=R(12,29),y=R(11,19);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
-  else if(kind==='mul2'){const x=R(11,29),y=R(3,9);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
-  else if(kind==='dec'){const t1=R(11,99),t2=R(11,99),isAdd=R(0,1)===0,fmt=t=>Math.floor(t/10)+'.'+(t%10);
+  if(kind==='frac'){const d=P([2,3,4,5]),k=R(2,7+bo),whole=d*k,num=R(1,d-1);items.push(n+')  '+num+'/'+d+' of '+whole+' = ____');a.push(num*k);}
+  else if(kind==='longmul'){const x=R(12,29+3*bo),y=R(11,19+2*bo);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
+  else if(kind==='mul2'){const x=R(11,29+3*bo),y=R(3,9+bo);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
+  else if(kind==='dec'){const t1=R(11,99+10*bo),t2=R(11,99+10*bo),isAdd=R(0,1)===0,fmt=t=>Math.floor(t/10)+'.'+(t%10);
    if(isAdd){items.push(n+')  '+fmt(t1)+' + '+fmt(t2)+' = ____');a.push(fmt(t1+t2));}
    else{const hi=Math.max(t1,t2),lo=Math.min(t1,t2);items.push(n+')  '+fmt(hi)+' − '+fmt(lo)+' = ____');a.push(fmt(hi-lo));}}
-  else if(kind==='ratio'){const x=P([2,3,4]),y=P(x===3?[5,7]:[3,5,7]),k=R(2,6);items.push(n+')  '+(x*k)+' : '+(y*k)+'  in simplest form = ____ : ____');a.push(x+':'+y);}
-  else if(kind==='pct'){const opts=[[10,10],[20,5],[25,4],[50,2],[5,20],[75,4]],[p,div]=P(opts),k=R(2,9),whole=k*div;items.push(n+')  '+p+'% of '+whole+' = ____');a.push(p*whole/100);}
-  else if(kind==='div'){const b=R(3,12),q=R(3,12);items.push(n+')  '+(b*q)+' ÷ '+b+' = ____');a.push(q);}
-  else{const x=R(3,12),y=R(3,12);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
+  else if(kind==='ratio'){const x=P([2,3,4]),y=P(x===3?[5,7]:[3,5,7]),k=R(2,6+bo);items.push(n+')  '+(x*k)+' : '+(y*k)+'  in simplest form = ____ : ____');a.push(x+':'+y);}
+  else if(kind==='pct'){const opts=[[10,10],[20,5],[25,4],[50,2],[5,20],[75,4]],[p,div]=P(opts),k=R(2,9+bo),whole=k*div;items.push(n+')  '+p+'% of '+whole+' = ____');a.push(p*whole/100);}
+  else if(kind==='div'){const b=R(3,12+bo),q=R(3,12+bo);items.push(n+')  '+(b*q)+' ÷ '+b+' = ____');a.push(q);}
+  else{const x=R(3,12+bo),y=R(3,12+bo);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
  }return{items,a};}
 
-function m_words(L){const B=[],a=[];let idx=0;const num=()=>P(NAMES);const fmt=p=>Math.floor(p/100)+'.'+String(p%100).padStart(2,'0');
+function m_words(L){const B=[],a=[];let idx=0;const num=()=>P(NAMES);const fmt=p=>Math.floor(p/100)+'.'+String(p%100).padStart(2,'0');const bo=L.boost||0;
  // 1) special problem driven by the level's headline skill
- if(L.pct){const O=R(2,9)*10,pc=P([10,20,50]),paid=O*(100-pc)/100;B.push((++idx)+')  A '+P(['bag','book','toy','game'])+' costs ₹'+O+'. In a sale it is '+pc+'% off. What is the sale price, and how much is saved?');a.push('pays ₹'+paid+', saves ₹'+(O-paid));}
- else if(L.ratio){const k=R(2,7),x=P([2,3,4]),y=P([3,5]),tot=(x+y)*k;B.push((++idx)+')  '+num()+' shares ₹'+tot+' with a friend in the ratio '+x+':'+y+'. How much does each get?');a.push('₹'+(x*k)+' and ₹'+(y*k));}
- else if(L.frac){const d=P([3,4,5]),k=R(3,8),whole=d*k,num2=R(1,d-1),got=num2*k;B.push((++idx)+')  A class has '+whole+' children. '+num2+'/'+d+' of them walk to school. How many walk, and how many do not?');a.push(got+' walk, '+(whole-got)+' do not');}
- else if(L.dec){const r1=R(2,9),p1=R(1,9)*5,r2=R(2,9),p2=R(1,9)*5;const t=(r1*100+p1)+(r2*100+p2);B.push((++idx)+')  '+num()+' buys milk for ₹'+r1+'.'+String(p1).padStart(2,'0')+' and bread for ₹'+r2+'.'+String(p2).padStart(2,'0')+'. What is the total?');a.push('₹'+Math.floor(t/100)+'.'+String(t%100).padStart(2,'0'));}
- else if(L.algebra>=2){const v1=R(3,9),v2=R(3,9),v3=R(3,9),v4=R(3,9),mx=Math.max(v1,v2,v3,v4),M=R(mx+6,mx+35),vBig=5*M-(v1+v2+v3+v4);const sorted=[v1,v2,v3,v4,vBig].slice().sort((p,q)=>p-q),med=sorted[2],who=num();B.push((++idx)+')  '+who+' is the oldest of 5 cousins and has collected '+vBig+' trading cards. '+who+'’s 4 younger cousins have collected '+v1+', '+v2+', '+v3+' and '+v4+' cards. For all 5 cousins together, which is greater — the mean (average) or the median — and by how many cards?');a.push('mean = '+M+' cards, median = '+med+' cards → mean is greater by '+(M-med)+' cards');}
- else if(L.algebra>=1){const who=num(),m=R(2,6),c=R(2,15),x=R(3,15),result=m*x+c;B.push((++idx)+')  '+who+' thinks of a number, multiplies it by '+m+', then adds '+c+'. The answer is '+result+'. What number did '+who+' think of?');a.push('number = '+x);}
+ if(L.pct){const O=R(2,9+bo)*10,pc=P([10,20,50]),paid=O*(100-pc)/100;B.push((++idx)+')  A '+P(['bag','book','toy','game'])+' costs ₹'+O+'. In a sale it is '+pc+'% off. What is the sale price, and how much is saved?');a.push('pays ₹'+paid+', saves ₹'+(O-paid));}
+ else if(L.ratio){const k=R(2,7+bo),x=P([2,3,4]),y=P([3,5]),tot=(x+y)*k;B.push((++idx)+')  '+num()+' shares ₹'+tot+' with a friend in the ratio '+x+':'+y+'. How much does each get?');a.push('₹'+(x*k)+' and ₹'+(y*k));}
+ else if(L.frac){const d=P([3,4,5]),k=R(3,8+bo),whole=d*k,num2=R(1,d-1),got=num2*k;B.push((++idx)+')  A class has '+whole+' children. '+num2+'/'+d+' of them walk to school. How many walk, and how many do not?');a.push(got+' walk, '+(whole-got)+' do not');}
+ else if(L.dec){const r1=R(2,9+bo),p1=R(1,9)*5,r2=R(2,9+bo),p2=R(1,9)*5;const t=(r1*100+p1)+(r2*100+p2);B.push((++idx)+')  '+num()+' buys milk for ₹'+r1+'.'+String(p1).padStart(2,'0')+' and bread for ₹'+r2+'.'+String(p2).padStart(2,'0')+'. What is the total?');a.push('₹'+Math.floor(t/100)+'.'+String(t%100).padStart(2,'0'));}
+ else if(L.algebra>=2){const v1=R(3,9+bo),v2=R(3,9+bo),v3=R(3,9+bo),v4=R(3,9+bo),mx=Math.max(v1,v2,v3,v4),M=R(mx+6,mx+35+3*bo),vBig=5*M-(v1+v2+v3+v4);const sorted=[v1,v2,v3,v4,vBig].slice().sort((p,q)=>p-q),med=sorted[2],who=num();B.push((++idx)+')  '+who+' is the oldest of 5 cousins and has collected '+vBig+' trading cards. '+who+'’s 4 younger cousins have collected '+v1+', '+v2+', '+v3+' and '+v4+' cards. For all 5 cousins together, which is greater — the mean (average) or the median — and by how many cards?');a.push('mean = '+M+' cards, median = '+med+' cards → mean is greater by '+(M-med)+' cards');}
+ else if(L.algebra>=1){const who=num(),m=R(2,6+bo),c=R(2,15+2*bo),x=R(3,15+2*bo),result=m*x+c;B.push((++idx)+')  '+who+' thinks of a number, multiplies it by '+m+', then adds '+c+'. The answer is '+result+'. What number did '+who+' think of?');a.push('number = '+x);}
  // 2) a steps-based problem (2 or 3 step)
  if(L.s>=3&&L.dec){const perP=R(2,19)*5,g=R(3,5),remP=perP*g,s1P=R(2,19)*5,s2P=R(2,19)*5,totP=remP+s1P+s2P,who=num();B.push((++idx)+')  '+who+' has ₹'+fmt(totP)+'. '+who+' buys a pencil for ₹'+fmt(s1P)+' and a rubber for ₹'+fmt(s2P)+', then splits what is left equally among '+g+' friends. How much does each friend get?');a.push('₹'+fmt(perP)+' each');}
  else if(L.s>=3){const per=L.longmul?R(6,15):R(3,7),g=R(3,5),rest=per*g,m=L.longmul?R(10,40):R(4,15),n=L.longmul?R(10,40):R(4,15),S=rest+m+n;B.push((++idx)+')  A shop starts with '+S+' stickers. It sells '+m+' in the morning and '+n+' in the afternoon, then packs the rest equally into '+g+' boxes. How many stickers per box?');a.push(per+' per box');}
@@ -560,15 +577,15 @@ const CHAL={
     ['⭐ A student was asked to add 7 to a number, then multiply the result by 3. Instead, they multiplied the number by 3 first, then added 7 — and got 46. What should the correct answer have been?','60  (the number was 13; correct: (13+7)×3=60)']]
 };
 
-function m_algebra(L){const B=[],a=[];
- if(L.algebra>=1){const x=R(3,12),b=R(2,15);B.push('1)  ▢ + '+b+' = '+(x+b)+'      ▢ = ____');a.push('▢ = '+x);
-   const y=R(2,9),c=R(2,9);B.push('2)  ▢ × '+c+' = '+(y*c)+'      ▢ = ____');a.push('▢ = '+y);}
- if(L.algebra>=2){const x=R(2,9),m=R(2,5),c=R(1,12);B.push('3)  '+m+'x + '+c+' = '+(m*x+c)+'      x = ____');a.push('x = '+x);
-   const x2=R(3,12),m2=R(2,4),c2=R(1,10);B.push('4)  '+m2+'x − '+c2+' = '+(m2*x2-c2)+'      x = ____');a.push('x = '+x2);}
+function m_algebra(L){const B=[],a=[];const bo=L.boost||0;
+ if(L.algebra>=1){const x=R(3,12+bo),b=R(2,15+2*bo);B.push('1)  ▢ + '+b+' = '+(x+b)+'      ▢ = ____');a.push('▢ = '+x);
+   const y=R(2,9+bo),c=R(2,9+bo);B.push('2)  ▢ × '+c+' = '+(y*c)+'      ▢ = ____');a.push('▢ = '+y);}
+ if(L.algebra>=2){const x=R(2,9+bo),m=R(2,5+bo),c=R(1,12+2*bo);B.push('3)  '+m+'x + '+c+' = '+(m*x+c)+'      x = ____');a.push('x = '+x);
+   const x2=R(3,12+bo),m2=R(2,4+bo),c2=R(1,10+2*bo);B.push('4)  '+m2+'x − '+c2+' = '+(m2*x2-c2)+'      x = ____');a.push('x = '+x2);}
  if(L.algebra>=3){
    // Lo Shu magic square (rows/cols/diagonals all sum to 15); affine-scaled by k,off keeps every
    // row/col/diagonal equal (new magic constant = 15k+3·off) — guarantees a valid puzzle every time.
-   const base=[2,7,6, 9,5,1, 4,3,8],k=R(2,9),off=R(1,20),grid=base.map(v=>v*k+off);
+   const base=[2,7,6, 9,5,1, 4,3,8],k=R(2,9+2*bo),off=R(1,20+5*bo),grid=base.map(v=>v*k+off);
    const r1=R(0,8),cc1=r1%3,rr1=(r1-cc1)/3,cand=[];
    for(let i=0;i<9;i++){const cc=i%3,rr=(i-cc)/3;if(rr!==rr1&&cc!==cc1)cand.push(i);}
    const b2=P(cand),disp=grid.map((v,i)=>(i===r1||i===b2)?'?':v);
@@ -577,12 +594,12 @@ function m_algebra(L){const B=[],a=[];
    a.push('missing = '+grid[r1]+' and '+grid[b2]);}
  return{h:'F. Algebra — find the unknown (show your working)',items:B,write:2,a:'F: '+a.join('; ')};}
 
-function m_geometry(L){const n=(L&&L.comp)?5:4,opt=R(0,n-1);
- if(opt===0){const l=R(4,12),w=R(3,9);return{h:'G. Geometry — a rectangle',items:['A rectangle is '+l+' cm long and '+w+' cm wide. Find its area and its perimeter.'],write:2,a:'G: area = '+(l*w)+' cm², perimeter = '+(2*(l+w))+' cm'};}
+function m_geometry(L){const n=(L&&L.comp)?5:4,opt=R(0,n-1),bo=(L&&L.boost)||0;
+ if(opt===0){const l=R(4,12+bo),w=R(3,9+bo);return{h:'G. Geometry — a rectangle',items:['A rectangle is '+l+' cm long and '+w+' cm wide. Find its area and its perimeter.'],write:2,a:'G: area = '+(l*w)+' cm², perimeter = '+(2*(l+w))+' cm'};}
  if(opt===1){const a1=R(30,80),a2=R(30,150-a1);return{h:'G. Geometry — a triangle',items:['Two angles of a triangle are '+a1+'° and '+a2+'°. Find the third angle.'],write:2,a:'G: '+(180-a1-a2)+'°'};}
- if(opt===2){const b=R(4,12),h=R(2,5)*2;return{h:'G. Geometry — a triangle’s area',items:['A triangle has base '+b+' cm and height '+h+' cm. Find its area.'],write:2,a:'G: '+(b*h/2)+' cm²'};}
- if(opt===3){const l1=R(7,14),w1=R(5,9),l2=R(2,5),w2=R(2,4),tot=l1*w1+l2*w2;return{h:'G. Geometry — a composite shape',items:['A room is an L-shape made of two rectangles: '+l1+' m × '+w1+' m, plus a smaller '+l2+' m × '+w2+' m section. Find the total floor area.'],write:3,a:'G: '+tot+' m²'};}
- const big=R(10,16),cut=R(2,5),tot=big*big,shaded=tot-cut*cut;return{h:'G. Geometry — a shaded region',items:['A square garden is '+big+' m × '+big+' m. A square pond '+cut+' m × '+cut+' m is built in one corner. Find the area of the garden NOT covered by the pond.'],write:3,a:'G: '+shaded+' m²'};}
+ if(opt===2){const b=R(4,12+bo),h=R(2,5+bo)*2;return{h:'G. Geometry — a triangle’s area',items:['A triangle has base '+b+' cm and height '+h+' cm. Find its area.'],write:2,a:'G: '+(b*h/2)+' cm²'};}
+ if(opt===3){const l1=R(7,14+bo),w1=R(5,9+bo),l2=R(2,5+bo),w2=R(2,4+bo),tot=l1*w1+l2*w2;return{h:'G. Geometry — a composite shape',items:['A room is an L-shape made of two rectangles: '+l1+' m × '+w1+' m, plus a smaller '+l2+' m × '+w2+' m section. Find the total floor area.'],write:3,a:'G: '+tot+' m²'};}
+ const big=R(10,16+bo),cut=R(2,5+bo),tot=big*big,shaded=tot-cut*cut;return{h:'G. Geometry — a shaded region',items:['A square garden is '+big+' m × '+big+' m. A square pond '+cut+' m × '+cut+' m is built in one corner. Find the area of the garden NOT covered by the pond.'],write:3,a:'G: '+shaded+' m²'};}
 
 /* Deduction/ordering puzzle — same logical skeleton as 1999 AMC 8 Problem 6 (5 people,
    comparison clues, asks who has the LEAST even though the full order can't be pinned down).
@@ -834,8 +851,8 @@ function downloadWS(){if(!CURWS){toast('Press “Make worksheet” first.');retu
 
 /* ===== THE STEP GAME: Done → level up → next sheet ===== */
 function doneLevelUp(gk,sk){const lad=LEVELS[gk][sk];
- if(LEVEL[gk][sk]<lad.length-1){LEVEL[gk][sk]++;save();renderSub(gk,sk);makeWS(gk,sk);toast('⬆️ Level up! Now: '+lad[LEVEL[gk][sk]].n);}
- else{renderSub(gk,sk);makeWS(gk,sk);toast('🌟 Top rung reached — you’re at the summit. New sheet made.');}
+ if(LEVEL[gk][sk]>=lad.length-1)lad.push(intensifyRung(lad[lad.length-1],lad.length-BASE_LADDER_LEN[gk][sk]+1));
+ LEVEL[gk][sk]++;save();renderSub(gk,sk);makeWS(gk,sk);toast('⬆️ Level up! Now: '+lad[LEVEL[gk][sk]].n);
 }
 function stepDown(gk,sk){const lad=LEVELS[gk][sk];if(LEVEL[gk][sk]>0){LEVEL[gk][sk]--;save();renderSub(gk,sk);makeWS(gk,sk);toast('↩︎ Stepped back to: '+lad[LEVEL[gk][sk]].n);}else toast('Already at the first rung.');}
 
@@ -845,8 +862,8 @@ function toast(msg){const t=document.getElementById('toast');if(!t)return;t.text
 function levelRail(gk,sk){const lad=LEVELS[gk][sk],here=LEVEL[gk][sk];let r='<div class="levelrail">';
  for(let i=0;i<lad.length;i++)r+='<span class="rung'+(i<=here?' on':'')+(i===here?' here':'')+'" title="'+lad[i].n+'"></span>';
  r+='</div>';
- const top=here>=lad.length-1;
- r+='<div class="lvline">Rung <b>'+(here+1)+' of '+lad.length+'</b> — '+lad[here].n+(top?' · 🏁 final rung':' · next: '+lad[here+1].n)+'</div>';
+ const top=here>=lad.length-1,beyond=here>=BASE_LADDER_LEN[gk][sk];
+ r+='<div class="lvline">Rung <b>'+(here+1)+(beyond?'':' of '+BASE_LADDER_LEN[gk][sk])+'</b> — '+lad[here].n+(top?' · 🚀 no ceiling — keeps climbing':' · next: '+lad[here+1].n)+'</div>';
  return r;}
 
 function panelHTML(gk,sk){const g=DATA[gk],s=g.subjects[sk];const li=LEVEL[gk][sk],lad=LEVELS[gk][sk];let h='';
