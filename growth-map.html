@@ -210,7 +210,7 @@ const LEVELS={
    {n:'Add & take to 20',   addMax:20, subMax:20, count:[2,5],     story:1, shapes:1},
    {n:'Teen numbers',       addMax:20, subMax:20, count:[2,5,10],  story:1, shapes:1, place:1},
    {n:'Within 100',         addMax:80, subMax:80, count:[5,10],    story:1, shapes:1, place:1},
-   {n:'Story sums',         addMax:60, subMax:60, count:[2,5,10],  story:2, shapes:1, place:1},
+   {n:'Story sums',         addMax:90, subMax:90, count:[2,5,10],  story:2, shapes:1, place:1},
    {n:'Regrouping',         addMax:99, subMax:99, count:[10],      story:2, shapes:1, place:1, regroup:1},
    {n:'Groups of 2·5·10',   addMax:99, subMax:99, count:[2,5,10],  story:2, shapes:0, mul:1},
    {n:'Two-step (little)',  addMax:99, subMax:99, count:[2,5,10],  story:2, shapes:0, mul:1, twostep:1},
@@ -646,8 +646,22 @@ function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans
  if(L.mul){const g=R(2,5),per=P([2,5,10]);blocks.push({h:'E. Groups',items:[g+' baskets have '+per+' apples each. How many apples in all?  ____   (draw the groups)']});ans.push('E: '+(g*per));}
  // shapes
  if(L.shapes){const sh=P([['3 sides','triangle'],['4 equal sides','square'],['round, no corners','circle'],['4 sides, 2 long & 2 short','rectangle']]);blocks.push({h:'F. Shape detective',items:['Draw a shape with '+sh[0]+'. What is it called? ____________']});ans.push('F: '+sh[1]);}
- // story sums
- if(L.story){const kind=R(0,1);if(kind===0){const a=R(3,9),b=R(2,6);blocks.push({h:'G. Story sum',items:[P(NAMES)+' has '+a+' balloons and gets '+b+' more. How many now?  ____'],write:1});ans.push('G: '+(a+b));}else{const a=R(6,12),b=R(1,5);blocks.push({h:'G. Story sum',items:[P(NAMES)+' had '+a+' sweets and ate '+b+'. How many left?  ____'],write:1});ans.push('G: '+(a-b));}}
+ // story sums — story:1 (rungs 3-5) keeps the original small within-20 shape unchanged.
+ // story:2 (rungs 6-7) was a dead-flag: the value 2 vs 1 was never actually read, so "Story sums"
+ // generated identical numbers to earlier rungs. Fixed: story:2 scales magnitude off addMax/subMax
+ // (NCERT ch.6 word problems run in the 20s-90s: shells, bangles, marbles, birds) and adds a third
+ // kind — missing-addend ("56 birds ... a few more joined ... now there are 87 ... how many joined?"),
+ // a genuinely new reasoning skill sourced straight from ch.6, not just bigger versions of add/subtract.
+ if(L.story){
+  if(L.story>=2){
+   const kind=R(0,2),addCap=L.addMax||60,subCap=L.subMax||addCap;
+   if(kind===0){const a=R(20,Math.max(21,addCap-15)),b=R(10,Math.max(11,addCap-a));blocks.push({h:'G. Story sum',items:[P(NAMES)+' collected '+a+' shells and found '+b+' more. How many shells now?  ____'],write:1});ans.push('G: '+(a+b));}
+   else if(kind===1){const a=R(Math.floor(subCap*0.5),subCap),b=R(10,a-5);blocks.push({h:'G. Story sum',items:[P(NAMES)+' had '+a+' bangles and gave away '+b+'. How many bangles left?  ____'],write:1});ans.push('G: '+(a-b));}
+   else{const start=R(20,50),total=R(start+10,Math.max(start+11,addCap));blocks.push({h:'G. Story sum',items:[start+' birds were sitting on a tree. A few more joined. Now there are '+total+' birds. How many birds joined?  ____'],write:1});ans.push('G: '+(total-start));}
+  }else{
+   const kind=R(0,1);if(kind===0){const a=R(3,9),b=R(2,6);blocks.push({h:'G. Story sum',items:[P(NAMES)+' has '+a+' balloons and gets '+b+' more. How many now?  ____'],write:1});ans.push('G: '+(a+b));}else{const a=R(6,12),b=R(1,5);blocks.push({h:'G. Story sum',items:[P(NAMES)+' had '+a+' sweets and ate '+b+'. How many left?  ____'],write:1});ans.push('G: '+(a-b));}
+  }
+ }
  if(L.twostep){const a=R(3,8),b=R(2,6),c=R(1,5);blocks.push({h:'H. Two-step story',items:[P(NAMES)+' has '+a+' stickers, buys '+b+' more, then gives '+c+' away. How many now?  ____'],write:1});ans.push('H: '+(a+b-c));}
  // I tens & ones (place value) — was a dead flag (L.place set on rungs 4-7 but never read); NCERT Cl.2
  // ch.1 "A Day at the Beach" (block-sticks/ten-strips) + ch.6 "Decoration for Festival" (T/O columns)
