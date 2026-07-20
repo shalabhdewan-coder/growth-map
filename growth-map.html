@@ -956,7 +956,21 @@ const SIGHT={
  b:[['I would like ____ apple, please.',['an','on','of']],['The dog ran ____ the garden.',['through','triangle','yellow']],['We will go ____ it stops raining.',['when','wind','was']],['She is taller ____ me.',['than','then','that']],['He gave the book ____ his friend.',['to','too','two']],['They are playing ____.',['outside','orange','under']],
   ['Take a bus ____ take a train.',['or','oar','ore']],['We go to school ____ foot.',['on','one','ant']],['She tied the ball ____ a piece of string.',['with','wing','was']],['I can climb ____ a cat.',['like','lake','lick']],['We reach school ____ time every day.',['on','ten','ant']],['The teacher put ____ a new chart.',['up','cup','pup']]],
  c:[['The soup was too hot, ____ I let it cool.',['so','sun','see']],['I like tea ____ I do not like coffee.',['but','big','bee']],['We stayed inside ____ it was raining.',['because','before','beside']],['First we washed, ____ we ate.',['then','they','that']],['She smiled ____ she was happy.',['because','balloon','between']],['I will read ____ you draw.',['while','white','which']],
-  ['The fly asked the tree ____ the ant did not know his name.',['because','before','beside']],['The leaf began to fly ____ the wind blew hard.',['when','win','wind']],['Farida and Anju felt ashamed ____ they saw the monkey clean up.',['after','at','ant']],['The monkey peeled the banana ____ he ate it.',['before','beside','because']],['The wind blew ____ the leaf was still on the ground.',['while','white','wide']],['The crow was still a crow ____ he wore peacock feathers.',['though','thought','throw']]]
+  ['The fly asked the tree ____ the ant did not know his name.',['because','before','beside']],['The leaf began to fly ____ the wind blew hard.',['when','win','wind']],['Farida and Anju felt ashamed ____ they saw the monkey clean up.',['after','at','ant']],['The monkey peeled the banana ____ he ate it.',['before','beside','because']],['The wind blew ____ the leaf was still on the ground.',['while','white','wide']],['The crow was still a crow ____ he wore peacock feathers.',['though','thought','throw']]],
+ // tier d — feeds the "Independent Study" ladder-extension rungs past rung 10 (Bridge to big-girl), once
+ // a rung's `boost` (set by intensifyRung on synthetic rungs only — never on hand-authored rungs 1-10)
+ // shifts effWtier past 'c'. Genuinely harder than tier c: longer sentences (10-15 words vs tier c's 6-9),
+ // less common connector words (until/unless/since/although/whenever/instead vs tier c's because/but/
+ // while/though/so), and 4 answer options instead of 3 (one extra distractor) — but themes (piano practice,
+ // rain, dinosaurs, a snowman, grandmother, a broken swing) stay concrete and age-6-appropriate, not
+ // jumped up to Sarah's register. No curriculum PDF reaches this — honestly original, same disclosure as
+ // the rest of this bank's hand-authored entries.
+ d:[['Maya kept practising the piano piece ____ she finally played it without a single mistake.',['until','under','uncle','unite']],
+  ['We will not be allowed to play outside ____ the rain stops completely.',['unless','under','uncle','until']],
+  ['Dev has loved dinosaurs ____ he was three years old.',['since','sense','sink','sign']],
+  ['The children still wanted to build a snowman ____ it was very cold outside.',['although','almost','always','around']],
+  ['Priya visits her grandmother ____ she gets the chance.',['whenever','where','whether','when']],
+  ['____ of complaining about the broken swing, Aarav decided to fix it himself.',['Instead','Inside','Instant','Insect']]]
 };
 /* RHYME pairs 1-6 general; 7-12 sourced from NCERT Class 1 Marigold Unit 1 "A Happy Child" /
    "Three Little Pigs" pronunciation-drill word families (sources/english/ncert-class1-english-marigold.pdf,
@@ -996,14 +1010,19 @@ const MWRITE={
    'Finish this and add one more line: “I like my best friend because ____.”']
 };
 function mwPick(key,book){const v=MWRITE[key]||MWRITE.word;const pick=Array.isArray(v)?P(v):v;return typeof pick==='function'?pick(book):pick;}
+// WT_ORDER — same ladder-extension tier-shift pattern as Sarah's VT_ORDER/GT_ORDER (reuses the shared
+// effTier() helper defined above). `boost` is only ever set by intensifyRung on synthetic rungs past
+// BASE_LADDER_LEN — undefined on hand-authored rungs 1-10, so effWtier===L.wtier there (no-op).
+const WT_ORDER=['a','b','c','d'];
 function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let blocks=[],ans=[];
+ const effWtier=effTier(WT_ORDER,L.wtier,L.boost);
  // A about my book
  blocks.push({h:'A. About my book — “'+book+'”',items:[
    '1) Who is in the story?  ____________________',
    '2) One new word I learned:  ____________',
    '3) Draw your favourite part, then write about it.'],write:1});
  // B sight words
- const sf=shuf(SIGHT[L.wtier]).slice(0,4),sa=[];
+ const sf=shuf(SIGHT[effWtier]).slice(0,4),sa=[];
  blocks.push({h:'B. Fill the gap (circle the right word)',items:sf.map((s,i)=>(i+1)+')  '+s[0]+'   ('+shuf(s[1]).join('  /  ')+')')});
  sf.forEach(s=>sa.push(s[1][0]));ans.push('B: '+sa.join(', '));
  // C rhyme (rung-gated)
