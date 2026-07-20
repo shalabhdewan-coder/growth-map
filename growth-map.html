@@ -649,6 +649,11 @@ function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans
  // story sums
  if(L.story){const kind=R(0,1);if(kind===0){const a=R(3,9),b=R(2,6);blocks.push({h:'G. Story sum',items:[P(NAMES)+' has '+a+' balloons and gets '+b+' more. How many now?  ____'],write:1});ans.push('G: '+(a+b));}else{const a=R(6,12),b=R(1,5);blocks.push({h:'G. Story sum',items:[P(NAMES)+' had '+a+' sweets and ate '+b+'. How many left?  ____'],write:1});ans.push('G: '+(a-b));}}
  if(L.twostep){const a=R(3,8),b=R(2,6),c=R(1,5);blocks.push({h:'H. Two-step story',items:[P(NAMES)+' has '+a+' stickers, buys '+b+' more, then gives '+c+' away. How many now?  ____'],write:1});ans.push('H: '+(a+b-c));}
+ // I tens & ones (place value) — was a dead flag (L.place set on rungs 4-7 but never read); NCERT Cl.2
+ // ch.1 "A Day at the Beach" (block-sticks/ten-strips) + ch.6 "Decoration for Festival" (T/O columns)
+ // and MOE P1 syllabus 1.2 ("make a group of ten and count on ... to tell the number") are the model.
+ if(L.place){const cap=Math.max(19,Math.min(99,L.addMax||19)),n=R(11,cap),t=Math.floor(n/10),o=n%10;
+  blocks.push({h:'I. Tens & ones',items:[n+' = ____ tens and ____ ones']});ans.push('I: '+t+' tens and '+o+' ones');}
  return{title:'Maths Worksheet — Mirayah (6)',sub:'Level '+(li+1)+'/'+LEVELS.mirayah.maths.length+' · '+L.n,level:'Age 6 · number sense — concrete & playful (joy first)',blocks,ans};}
 
 /* ---------- ENGLISH · content banks ---------- */
