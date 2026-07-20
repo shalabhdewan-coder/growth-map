@@ -213,7 +213,7 @@ const LEVELS={
    {n:'Story sums',         addMax:90, subMax:90, count:[2,5,10],  story:2, shapes:1, place:1},
    {n:'Regrouping',         addMax:99, subMax:99, count:[10],      story:2, shapes:1, place:1, regroup:1},
    {n:'Groups of 2·5·10',   addMax:99, subMax:99, count:[2,5,10],  story:2, shapes:0, mul:1, mulMax:40},
-   {n:'Two-step (little)',  addMax:99, subMax:99, count:[2,5,10],  story:2, shapes:0, mul:1, twostep:1},
+   {n:'Two-step (little)',  addMax:99, subMax:99, count:[2,5,10],  story:2, shapes:0, mul:1, mulMax:60, twostep:1},
    {n:'Bridge to big-girl', addMax:99, subMax:99, count:[3,4,6],   story:2, shapes:0, mul:1, twostep:1}
   ],
   english:[
@@ -672,7 +672,16 @@ function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans
    const kind=R(0,1);if(kind===0){const a=R(3,9),b=R(2,6);blocks.push({h:'G. Story sum',items:[P(NAMES)+' has '+a+' balloons and gets '+b+' more. How many now?  ____'],write:1});ans.push('G: '+(a+b));}else{const a=R(6,12),b=R(1,5);blocks.push({h:'G. Story sum',items:[P(NAMES)+' had '+a+' sweets and ate '+b+'. How many left?  ____'],write:1});ans.push('G: '+(a-b));}
   }
  }
- if(L.twostep){const a=R(3,8),b=R(2,6),c=R(1,5);blocks.push({h:'H. Two-step story',items:[P(NAMES)+' has '+a+' stickers, buys '+b+' more, then gives '+c+' away. How many now?  ____'],write:1});ans.push('H: '+(a+b-c));}
+ // H two-step — twostep:1 (this rung) was a magnitude-dead flag: it was read but a/b/c were hardcoded to
+ // single digits regardless of addMax/subMax:99, so "Two-step (little), within 99" generated the same
+ // tiny numbers a much easier rung would (same bug class as story:2 at rung 6 / place at rung 4). Fixed:
+ // magnitude now derives from cap=max(addMax,subMax) so the result genuinely tracks the rung's ceiling.
+ if(L.twostep){
+  const cap=Math.max(L.addMax||30,L.subMax||30);
+  const a=R(20,Math.max(21,Math.floor(cap*0.5))),b=R(5,Math.max(6,Math.floor(cap*0.25))),sum=a+b,c=R(1,Math.max(1,Math.min(sum-5,Math.floor(cap*0.3))));
+  blocks.push({h:'H. Two-step story',items:[P(NAMES)+' has '+a+' stickers, buys '+b+' more, then gives '+c+' away. How many now?  ____'],write:1});
+  ans.push('H: '+(a+b-c));
+ }
  // I tens & ones (place value) — was a dead flag (L.place set on rungs 4-7 but never read); NCERT Cl.2
  // ch.1 "A Day at the Beach" (block-sticks/ten-strips) + ch.6 "Decoration for Festival" (T/O columns)
  // and MOE P1 syllabus 1.2 ("make a group of ten and count on ... to tell the number") are the model.
