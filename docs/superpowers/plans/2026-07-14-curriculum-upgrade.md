@@ -137,7 +137,7 @@ One task per rung per girl — 12 for Sarah, 10 for Mirayah, 22 total. Each foll
 
 **Sarah rungs to run through this shape:** 1 Tables&2-step · 2 Bigger numbers · 3 Three-step · 4 Fractions begin · 5 Decimals&money · 6 Multiplication mastery · 7 Ratio&proportion · 8 Percentages · 9 Pre-algebra · 10 Algebra&geometry · 11 Competition heuristics · 12 Quantitative spike
 
-**Mirayah rungs to run through this shape:** 1 Counting play · 2 Bonds to 10 · 3 Add&take to 20 · 4 Teen numbers · 5 Within 100 · 6 Story sums · 7 Regrouping · 8 Groups of 2·5·10 · 9 Two-step (little) · 10 Bridge to big-girl
+**Mirayah rungs to run through this shape:** 1 Counting play · 2 Bonds to 10 · 3 Add&take to 20 · 4 Teen numbers · 5 Within 100 · 6 Story sums · 7 Regrouping · 8 Groups of 2·5·10 · 9 Two-step (little) · 10 Bridge to big-girl — **all 10 done 2026-07-20 (Mirayah's maths ladder is complete)**, commits `c9a5353`/`d1a240a`/`4975a04` for rungs 8-10.
 
 ## Phase 3 — English (same per-rung shape as Phase 2, adapted for content banks)
 
