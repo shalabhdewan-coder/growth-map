@@ -246,19 +246,49 @@ const SWIM=[
  {n:'Race strategy & taper',   wu:'easy 300 m',                           main:'2 × race-pace efforts, full recovery',                tech:'Rehearse the exact race plan and breathing', goal:'Execute a planned race, start to finish'},
  {n:'Representative pathway',  wu:'coach-led',                            main:'Individualised programme with the squad coach',       tech:'Consistency, recovery and mindset', goal:'Selected to represent club / zone / state'}
 ];
+/* Sourced from ABRSM Qualification Specification: Practical Music, Piano 2025 & 2026
+   (sources/music/abrsm-piano-syllabus-2025-2026.pdf, © ABRSM, valid Jan 2025–Dec 2026).
+   9 real discrete grades (Initial + 1–8) — see content/music-piano.md for full per-rung
+   sourcing (page cites) and honesty notes, incl. that 'mins' is NOT an ABRSM figure
+   (it's a reasonable general-knowledge daily-practice estimate — ABRSM publishes only
+   cumulative Guided Learning Hours / Total Qualification Time per grade, p.6). */
 const MUSIC=[
- {n:'Notes & rhythm basics',  tech:'Clap & count simple rhythms; name notes on the stave', piece:'A very short 4–8 bar tune', sight:'Say the note names in 4 bars', aural:'Clap back a short rhythm', mins:15},
- {n:'Grade 1 pieces',         tech:'C & G major scales, one octave',                        piece:'One Grade 1 piece, parts together', sight:'4 bars, simple rhythm', aural:'Echo a short phrase', mins:20},
- {n:'Scales & sight-reading', tech:'Add F & D major; simple arpeggios',                     piece:'Polish two Grade 1–2 pieces', sight:'6–8 bars, slow tempo', aural:'Higher/lower, louder/softer', mins:20},
- {n:'Grade 2',                tech:'Scales to 2 sharps/flats; staccato & legato',           piece:'A Grade 2 piece to performance standard', sight:'Grade 2 sight-reading', aural:'Find and clap the pulse', mins:25},
- {n:'Grade 3',                tech:'Scales + contrary motion; dynamics',                    piece:'A Grade 3 piece with expression', sight:'Grade 3 sight-reading', aural:'Spot the changes in a phrase', mins:25},
- {n:'Aural & theory base',    tech:'Key & time signatures; intervals',                      piece:'Maintain two pieces', sight:'Transpose a simple line', aural:'Major vs minor feel', mins:25},
- {n:'Grade 4',                tech:'All majors & minors to 3 accidentals',                  piece:'A Grade 4 piece — shape the phrases', sight:'Grade 4 sight-reading', aural:'Sing / identify intervals', mins:30},
- {n:'Grade 5 (+theory gate)', tech:'Grade 5 scales; pass Grade 5 Theory',                   piece:'A Grade 5 piece', sight:'Grade 5 sight-reading', aural:'Cadences & modulation feel', mins:30},
- {n:'Performance & expression',tech:'Tone, rubato, dynamic control',                        piece:'Perform a full programme to an audience', sight:'Read a new piece cold, musically', aural:'Describe style & mood', mins:35},
- {n:'Grade 6',                tech:'Advanced scales & studies',                             piece:'Grade 6 repertoire', sight:'Grade 6 sight-reading', aural:'Analyse a short extract', mins:35},
- {n:'Grade 7',                tech:'Studies for agility & tone',                            piece:'Grade 7 repertoire', sight:'Grade 7 sight-reading', aural:'Harmonic listening', mins:40},
- {n:'Grade 8 / diploma path', tech:'Full technical work',                                   piece:'A Grade 8 programme', sight:'Advanced sight-reading', aural:'Advanced aural', mins:45}
+ {n:'Initial Grade',  tech:'C major & D minor scales, hands separately, 1 oct.; C major contrary-motion scale (5th, hands in unison); C major & D minor arpeggios, hands separately (5th) — all from memory, legato',
+  piece:'3 pieces, one from each of Lists A/B/C (e.g. A: "Gopak"; B: "Melody in G", Beyer; C: "The Elephant Herd")',
+  sight:'4 bars 4/4 or 6 bars 2/4; C major/D minor; each hand separately in 5-finger position',
+  aural:'Clap the pulse; clap back a 2-bar rhythm echo; sing back a 1-bar melodic echo; answer 1 question on dynamics or articulation', mins:15},
+ {n:'Grade 1', tech:'C major hands together (1 oct.); G,F majors & A,D minors hands separately (2 oct.); C major contrary-motion (1 oct.); G major & A minor arpeggios hands separately (1 oct.)',
+  piece:'3 pieces, Lists A/B/C (e.g. A: "Fireworks Minuet", Handel; B: "A Song of Erin", Dunhill; C: "Cyberspace Detective")',
+  sight:'6 bars, 3/4; keys add G,F majors & A minor; any 5-finger position; slurs, accents, mf/mp',
+  aural:'Clap pulse + say 2-time or 3-time; sing a 3-phrase echo; spot where a pitch change happens in a phrase; answer 2 questions (dynamics + articulation)', mins:18},
+ {n:'Grade 2', tech:'G,F majors & A,D minors hands together (2 oct.); D,A majors & E,G minors hands separately (2 oct.); C major contrary-motion (2 oct.); chromatic scale from D (1 oct.); D,A major & E,G minor arpeggios hands separately (2 oct.)',
+  piece:'3 pieces, Lists A/B/C (e.g. A: "Sparkling Splashes & Smooth Water"; B: "The Singing Swan", Ffrench; C: "Spooky Wood Hollow")',
+  sight:'Up to 8 bars; keys add D major & E,G minors; hands playing together; tied notes, pp',
+  aural:'Clap pulse + time id; sing a 3-phrase echo (wider range); identify a pitch OR rhythm change; answer 2 questions (dynamics/articulation, plus tempo)', mins:20},
+ {n:'Grade 3', tech:'D,A majors & E,G minors hands together (2 oct.); Bb,Eb majors & B,C minors hands separately (2 oct.); E major contrary-motion (2 oct.); chromatic contrary-motion from D (1 oct.); D,A,Bb,Eb major & E,G,B,C minor arpeggios (2 oct.)',
+  piece:'3 pieces, Lists A/B/C (e.g. A: "Allegro moderato", Köhler; B: "Where is love?", from Oliver!; C: "Allegretto", Bartók)',
+  sight:'Up to 8 bars, 3/8 introduced; keys add A,Bb,Eb majors & B minor; outside 5-finger position; 2-note chords',
+  aural:'Clap pulse + 2/3/4-time id; sing a 3-phrase echo, major or minor; spot a pitch/rhythm change over up to 4 bars; answer 2 questions incl. tonality', mins:20},
+ {n:'Grade 4', tech:'Bb,Eb majors & B,C minors hands together (2 oct.); B,F#,Ab majors & F#,F minors hands separately (2 oct.); Eb major contrary-motion + C harmonic minor (2 oct.); chromatic from F# hands together (2 oct.); matching arpeggios',
+  piece:'3 pieces, Lists A/B/C (e.g. A: "Allegro assai", Benda; B: "Waltz", Grieg; C: "Danse du cocher", Ibert)',
+  sight:'c.8 bars, 6/8 introduced; anacrusis, chromatic notes, pause signs, tenuto',
+  aural:'Sing/play from memory a melody played twice; sing 5 notes from score at sight; answer 2 questions (one of dynamics/articulation/tempo/tonality, plus character); clap rhythm from an extract + time id', mins:25},
+ {n:'Grade 5', tech:'A,E,B,F#,Db majors & F#,C#,G#,Eb,Bb minors hands together, legato (2 oct.); Ab major/F minor staccato hands separately (2 oct.); Db contrary-motion + C# harmonic minor contrary-motion (2 oct.); chromatic contrary-motion a 3rd apart (2 oct.); matching arpeggios + diminished 7th from B',
+  piece:'3 pieces, Lists A/B/C (e.g. A: "La tarentelle", Burgmüller; B: "Someone You Loved", arr. Iles; C: "The Village in May", Hisaishi)',
+  sight:'c.8–12 bars; keys add E,Ab majors & F#,C minors; 4-part chords (max 2 notes/hand), simple syncopation, ff',
+  aural:'Sing/play from memory a melody played twice; sing 6 notes from score at sight; answer 2 questions incl. style and period; clap rhythm + time id', mins:25},
+ {n:'Grade 6', tech:'ENTRY GATE: must already hold ABRSM Grade 5 (or above) in Music Theory, Practical Musicianship, or a solo Jazz instrument. Scales: D,F,Ab,B majors & D,F,G#,B minors (harmonic+melodic) hands together, legato/staccato (4 oct.); contrary-motion (2 oct.); chromatic from G# and B (4 oct.); matching arpeggios + dominant 7ths + diminished 7ths',
+  piece:'3 pieces, Lists A/B/C (e.g. A: "Invention No.14 in Bb", J.S. Bach; B: "Bagatelle in F", Hensel; C: "Stamping Dance", Bartók)',
+  sight:'c.12–16 bars; 9/8, 5/8, 5/4 introduced; keys add C#,F minors; triplet rhythms, clef changes, right pedal',
+  aural:'Sing/play from memory the upper part of a 2-part phrase; sing a melody from score with accompaniment; identify a cadence as perfect or imperfect; answer 2 questions incl. texture/structure; clap rhythm + time id', mins:30},
+ {n:'Grade 7', tech:'Same Grade-5-theory-or-equivalent entry gate as Grade 6. Scales: Db,E,G,Bb majors & C#,E,G,Bb minors, similar motion + thirds apart, legato/staccato (4 oct.); contrary-motion (2 oct.); G major legato & staccato scales in thirds hands separately (2 oct.); chromatic contrary-motion a minor 3rd apart (2 oct.); arpeggios first-inversion + dominant/diminished 7ths',
+  piece:'3 pieces, Lists A/B/C (e.g. A: "Scherzo", Beethoven Sonata Op.2 No.2; B: Schumann Album für die Jugend No.30; C: "The Watermill", Kahn)',
+  sight:'c.16–20 bars; 7/8, 7/4 introduced; tempo changes, 8va sign, una corda pedal',
+  aural:'Sing/play from memory the lower part of a 2-part phrase; sing the upper part from score against the examiner’s lower part; identify a cadence as perfect/imperfect/interrupted then name its 2 chords; identify a modulation (dominant/subdominant/relative minor); answer 2 questions incl. style/period/structure; clap rhythm + time id incl. 6/8', mins:35},
+ {n:'Grade 8', tech:'Same entry gate as Grade 6/7 — top of the graded pathway. Scales: C,Eb,F#,A majors & C,Eb,F#,A minors, similar motion + sixths apart, legato/staccato (4 oct.); contrary-motion (2 oct.); Eb legato scale in thirds + C staccato scale in sixths hands separately (2 oct.); chromatic a 6th apart + whole-tone scales (4 oct.); arpeggios second-inversion + dominant/diminished 7ths',
+  piece:'3 pieces, Lists A/B/C (e.g. A: "Alla Turca", Mozart K.331; B: "La fille aux cheveux de lin", Debussy; C: "In the Dew", Cheryl Frances-Hoad)',
+  sight:'c.1 page; 12/8 introduced; keys add B,Db majors; 3-part chords, spread chords, simple ornaments, acceleration of tempo',
+  aural:'Sing/play from memory the lowest part of a 3-part phrase; identify a cadence (perfect/imperfect/interrupted/plagal) then name all 3 chords; sing the lower part of a 2-part phrase against the examiner’s upper part; identify 2 modulations (dominant/subdominant/relative minor-or-major); freely describe an examiner-played piece’s texture, structure, character, style and period', mins:40}
 ];
 const RIDE=[
  {n:'Care & mounting',          ground:'Grooming, leading & tacking up with help', flat:'Sit tall at halt; hold the reins correctly', ex:'Mount & dismount safely', safe:'Helmet & boots always; stay calm around the horse'},
