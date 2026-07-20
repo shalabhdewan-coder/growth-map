@@ -745,7 +745,13 @@ const VOCAB={
  // story → bewildered; general → empathetic. Definitions hand-written, same discipline as the base 8.
  hard:[['ferocious','fierce and violent'],['cunning','clever in a sly way'],['triumphant','joyful after a victory'],['suspicious','feeling something is wrong'],['feeble','weak and frail'],['vast','extremely large'],['resilient','able to recover quickly'],['deliberate','done on purpose and carefully'],
   ['valiant','brave and determined, especially in a difficult situation'],['diligent','careful and steady in your effort or work'],['integrity','being honest and having strong moral principles'],['wary','cautious because you sense possible danger'],['steadfast','loyal and unchanging, even when it is hard'],['tranquil','very calm, peaceful and still'],['bewildered','very confused, unsure what is happening'],['empathetic','able to understand and share someone else’s feelings']],
- harder:[['meticulous','very careful and precise'],['ambivalent','having mixed feelings'],['tenacious','holding on firmly; persistent'],['candid','honest and direct'],['profound','very deep or intense'],['inevitable','certain to happen'],['scrutinise','to examine very closely'],['eloquent','fluent and persuasive with words']]
+ // harder tier (rung9-12 vt: "Rhetoric & technique"/"Debate"/"Personal voice"/"Interview reasoning"):
+ // base 8 + 8 new. New words are chosen for the specific skill each of these 4 rungs drills — making
+ // and weighing an argument, speaking in your own voice, reasoning under questioning — rather than tied
+ // to a passage theme (these rungs' passages are the same shared tier-3 pool, not new rung-specific texts).
+ // Hand-written definitions, same style discipline as the base 8.
+ harder:[['meticulous','very careful and precise'],['ambivalent','having mixed feelings'],['tenacious','holding on firmly; persistent'],['candid','honest and direct'],['profound','very deep or intense'],['inevitable','certain to happen'],['scrutinise','to examine very closely'],['eloquent','fluent and persuasive with words'],
+  ['articulate','able to express ideas clearly and effectively'],['persuasive','good at making someone believe or do something'],['coherent','clear, logical and easy to follow'],['concede','to admit that something is true, even if you don’t want to'],['rebuttal','an argument given to prove another argument wrong'],['nuanced','having small but important differences or shades of meaning'],['credible','believable and worthy of trust'],['anecdote','a short, true story told to make a point']]
 };
 const GRAMMAR={
  // easy tier (rung1-3): base 6 + 6 new — common Indian-English learner error patterns (subject-verb
@@ -851,6 +857,21 @@ const WRITE_TASKS={
  personal:b=>'Reflective writing: describe a time you found something hard and kept going. What does that story show about you? (This is how a personal statement begins.)',
  interview:b=>'You have 5 minutes with an admissions tutor. In writing, answer: “Tell me about a book that changed how you think, and why.” Make a real point and defend it.'
 };
+// RHETORIC — rhetorical-technique bank, gated on LEVELS.sarah.english[li].tech (rungs 9-12: "Rhetoric &
+// technique", "Debate — both sides", "Personal voice", "Interview reasoning" — all four carry tech:1,
+// verified by re-reading LEVELS.sarah.english[8..11] directly; a prior finding said "rungs 9-11" but that
+// undercounted rung 12, which also sets tech:1). L.tech was set on these rungs from the start but
+// ws_english_sarah never read it — a dead flag (see content/english-sarah-rung1.md's dead-flag audit,
+// re-confirmed in rungs 5-8's audits). Fixed by wiring a real "Spot the technique" block off it, directly
+// matching WRITE_TASKS.rhetoric's own instruction to "use at least one rhetorical question and one rule of
+// three" — the block teaches/drills the exact devices the writing task then asks the child to produce.
+const RHETORIC=[
+ {name:'Rhetorical question',explain:'a question asked to make a point, not to get a real answer',example:'“Isn’t it obvious that reading makes you smarter?”'},
+ {name:'Rule of three',explain:'listing three things together to make an idea feel complete and powerful',example:'“Fast, fun and unforgettable.”'},
+ {name:'Repetition',explain:'saying the same word or phrase more than once so it sticks in the listener’s mind',example:'“Never give up. Never stop trying. Never look back.”'},
+ {name:'Hyperbole',explain:'a huge exaggeration used for effect, not meant to be taken literally',example:'“I have told you a million times already!”'},
+ {name:'Alliteration',explain:'using the same starting sound in several words close together',example:'“Sam sipped his soup slowly.”'}
+];
 
 function ws_english_sarah(li,book){const L=LEVELS.sarah.english[li];let blocks=[],ans=[];
  // A vocab
@@ -869,8 +890,23 @@ function ws_english_sarah(li,book){const L=LEVELS.sarah.english[li];let blocks=[
  // D grammar
  const gr=shuf(GRAMMAR[L.gt]).slice(0,L.gc),ga=[];
  blocks.push({h:'D. Fix the sentence (rewrite it correctly)',items:gr.map((g,i)=>(i+1)+')  '+g[0]),write:2});gr.forEach(g=>ga.push(g[1]));ans.push('D: '+ga.join('  '));
- // E writing
- blocks.push({h:'E. Writing challenge',items:[WRITE_TASKS[L.write](book)],write:6});
+ // E technique — L.tech-gated (rungs 9-11 only). Teaches two rhetorical devices, asks the child to hunt
+ // for one in the Block C passage (or explain how the writer achieves a similar effect if neither appears
+ // in that particular draw), then produce their own sentence using one device — direct prep for WRITE_TASKS.rhetoric.
+ let wLetter='E';
+ if(L.tech){
+  const td=shuf(RHETORIC).slice(0,2);
+  blocks.push({h:'E. Spot the technique',items:[
+    '1)  '+td[0].name+' — '+td[0].explain+'.  Example: '+td[0].example,
+    '2)  '+td[1].name+' — '+td[1].explain+'.  Example: '+td[1].example,
+    '3)  Look at the passage in Block C. Can you find either technique used there? If yes, quote it and name it. If not, explain how the writer creates a similar effect in their own words.  ____',
+    '4)  Now write your own sentence using '+td[0].name+':  ____'
+   ],write:2});
+  ans.push('E techniques: '+td.map(d=>d.name+' = '+d.explain).join('; ')+' (Q3/Q4 open — accept any correctly identified device or grammatically sound original sentence using it)');
+  wLetter='F';
+ }
+ // F/E writing
+ blocks.push({h:wLetter+'. Writing challenge',items:[WRITE_TASKS[L.write](book)],write:6});
  return{title:'English Worksheet — Sarah (8)',sub:'Level '+(li+1)+'/'+LEVELS.sarah.english.length+' · '+L.n+'   ·   📖 '+book,level:eLevelTag(li),blocks,ans};}
 function eLevelTag(li){const map=['P3 · fact + vocab comprehension','P3–P4 · inference','P4 · vocab-in-context','P4 · opinion + reasoning','P5 · multi-paragraph writing','P5 · persuasive writing','P5–P6 · structured argument','P6 · essay structure','Rhetoric & technique','Debate — argue both sides','Personal-statement voice','Interview / seminar reasoning'];return map[li]||'Sarah English';}
 
