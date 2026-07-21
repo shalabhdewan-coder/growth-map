@@ -1134,9 +1134,15 @@ function ws_english_sarah(li,book){const L=LEVELS.sarah.english[li];let blocks=[
  // D grammar
  const gr=shuf(GRAMMAR[effGt]).slice(0,L.gc),ga=[];
  blocks.push({h:'D. Fix the sentence (rewrite it correctly)',items:gr.map((g,i)=>(i+1)+')  '+g[0]),write:2});gr.forEach(g=>ga.push(g[1]));ans.push('D: '+ga.join('  '));
- // E technique — L.tech-gated (rungs 9-12). Teaches two rhetorical devices, asks the child to hunt
- // for one in the Block C passage (or explain how the writer achieves a similar effect if neither appears
- // in that particular draw), then produce their own sentence using one device — direct prep for WRITE_TASKS.rhetoric.
+ // E/F technique — L.tech-gated (rungs 9-12). E teaches two rhetorical devices (pure exposition —
+ // a name + definition + example, nothing to get right or wrong) and must NOT count toward
+ // MTOTAL/mastery, so it carries ungraded:true same as the free-response blocks below. F is the real
+ // assessment: hunt for one device in the Block C passage (or explain how the writer achieves a similar
+ // effect if neither appears in that particular draw), then produce their own sentence using one device —
+ // direct prep for WRITE_TASKS.rhetoric. Previously both the teaching lines and the real questions lived
+ // in one un-ungraded "E. Spot the technique" block, so wsQuestionCount() counted all 4 lines as graded
+ // questions — inflating MTOTAL by 2 free/uncheckable "questions" per rung 9-12 sheet and diluting the
+ // 80% mastery bar relative to rungs 5-8 (see growth-map-exhaustive-audit finding, rung 9-12 Block E).
  let wLetter='E';
  if(L.tech){
   // rung 9 (write:'rhetoric') must drill the exact two devices WRITE_TASKS.rhetoric hardcodes;
@@ -1145,14 +1151,16 @@ function ws_english_sarah(li,book){const L=LEVELS.sarah.english[li];let blocks=[
   const td=L.write==='rhetoric'
    ? shuf([RHETORIC.find(d=>d.name==='Rhetorical question'),RHETORIC.find(d=>d.name==='Rule of three')])
    : shuf(RHETORIC).slice(0,2);
-  blocks.push({h:'E. Spot the technique',items:[
+  blocks.push({h:'E. Learn the technique',items:[
     '1)  '+td[0].name+' — '+td[0].explain+'.  Example: '+td[0].example,
-    '2)  '+td[1].name+' — '+td[1].explain+'.  Example: '+td[1].example,
-    '3)  Look at the passage in Block C. Can you find either technique used there? If yes, quote it and name it. If not, explain how the writer creates a similar effect in their own words.  ____',
-    '4)  Now write your own sentence using '+td[0].name+':  ____'
+    '2)  '+td[1].name+' — '+td[1].explain+'.  Example: '+td[1].example
+   ],write:0,ungraded:true});
+  blocks.push({h:'F. Spot the technique',items:[
+    '1)  Look at the passage in Block C. Can you find either technique used there? If yes, quote it and name it. If not, explain how the writer creates a similar effect in their own words.  ____',
+    '2)  Now write your own sentence using '+td[0].name+':  ____'
    ],write:2});
-  ans.push('E techniques: '+td.map(d=>d.name+' = '+d.explain).join('; ')+' (Q3/Q4 open — accept any correctly identified device or grammatically sound original sentence using it)');
-  wLetter='F';
+  ans.push('E/F techniques: '+td.map(d=>d.name+' = '+d.explain).join('; ')+' (F: Q1/Q2 open — accept any correctly identified device or grammatically sound original sentence using it)');
+  wLetter='G';
  }
  // F/E writing — free-response task with no printed answer key; must not count toward MTOTAL/mastery.
  blocks.push({h:wLetter+'. Writing challenge',items:[WRITE_TASKS[L.write](book)],write:6,ungraded:true});
