@@ -1029,7 +1029,10 @@ const RHYME=[['cat',['hat','dog','sun']],['tree',['bee','car','book']],['star',[
  ['bad',['sad','dog','milk']],['big',['dig','car','sun']],['sun',['bun','tree','king']],['red',['bed','fish','four']],['hot',['cot','book','star']],['puff',['stuff','light','tree']]];
 /* MINISTORY 1-3 original; 4-6 grounded in real NCERT stories, shortened to age-6 length (see
    content/english-mirayah-rung3.md and rung4.md for exact source pages); 7-9 original, honestly
-   not NCERT-sourced. */
+   not NCERT-sourced; 10-12 grounded in real NCERT Class 2 Mridang chapters, shortened to age-6
+   length (see content/english-mirayah-rung7.md for exact source pages) — the fly forgetting his
+   own name (ch09 "My Name"), Anju and Farida learning from the monkey's dustbin (ch11 "The Smart
+   Monkey"), and the crow who wore peacock feathers (ch10 "The Crow", poem adapted). */
 const MINISTORY=[
  {t:'Sam has a little red ball. He kicks it in the garden. The ball rolls under a bush. Sam looks and looks, and finds it!',q:['Q) What colour is Sam’s ball?','Q) Where did the ball roll?'],a:['red','under a bush'],x:'Q) How do you think Sam felt when he finally found the ball?',xa:'happy / relieved — he had looked and looked'},
  {t:'Pip the puppy is hungry. She looks in her bowl but it is empty. She runs to find Mum, who fills the bowl. Pip wags her tail.',q:['Q) Why did Pip run to Mum?','Q) How did Pip feel at the end?'],a:['she was hungry / her bowl was empty','happy (she wagged her tail)'],x:'Q) What does this story tell you about how Mum takes care of Pip?',xa:'Mum feeds her and looks after her when she is hungry'},
@@ -1248,7 +1251,12 @@ function isAcad(sk){return sk==='english'||sk==='maths'||sk==='science';}
 const MASTERY_PASS=0.8; /* need 80%+ correct (per answer key) to level up an academic subject */
 
 function doDoneLevelUp(gk,sk){const lad=LEVELS[gk][sk];
- if(LEVEL[gk][sk]>=lad.length-1)lad.push(intensifyRung(lad[lad.length-1],lad.length-BASE_LADDER_LEN[gk][sk]+1));
+ /* Always scale from the true original last hand-authored rung (never from a
+    previously-intensified synthetic one) — otherwise each level-up multiplies
+    an already-multiplied value by an ever-larger factor and runs away
+    (e.g. MUSIC 'mins' hit 2104 after 8 clicks). Tier still climbs by 1 each
+    push, so growth stays linear in tier instead of compounding. */
+ if(LEVEL[gk][sk]>=lad.length-1)lad.push(intensifyRung(lad[BASE_LADDER_LEN[gk][sk]-1],lad.length-BASE_LADDER_LEN[gk][sk]+1));
  LEVEL[gk][sk]++;save();renderSub(gk,sk);makeWS(gk,sk);toast('⬆️ Level up! Now: '+lad[LEVEL[gk][sk]].n);
 }
 function doneLevelUp(gk,sk){
