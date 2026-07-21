@@ -1,12 +1,14 @@
 # Sarah — English — Rung 7 "Structure & argument"
 
-**Knobs:** `{n:'Structure & argument', vt:'hard', pt:3, gt:'hard', gc:5, write:'argument'}` — `eLevelTag` = "P5–P6 · structured argument".
+**Knobs:** `{n:'Structure & argument', vt:'hard', pt:3, gt:'hard', gc:6, write:'argument'}` — `eLevelTag` = "P5–P6 · structured argument".
 
 See `content/english-sarah-rung1.md` for shared architecture; `content/english-sarah-rung5.md` and `-rung6.md` for the shared PASSAGES/VOCAB.hard/GRAMMAR.hard extensions this rung inherits (no rung-7-specific bank change needed — same tiers as rung 6).
 
+**2026-07-21 update:** an audit flagged that rungs 6/7/8 had byte-identical `vt/pt/gt/gc` and were therefore statistically indistinguishable in Blocks A/C/D — only Block E's `write` prompt differed. `gc` bumped 5→6 here (rung 8 bumped 5→7) so Block D (grammar-fix count) genuinely escalates rung-to-rung, on top of the `write` progression below. `GRAMMAR.hard` has 20 entries, comfortably covering a draw of 6.
+
 ## What rung 7 tests (per its own knobs)
 
-Identical tier selection to rung 6 (`vt:'hard'`, `pt:3`, `gt:'hard'`, `gc:5`) — the only difference between rungs 6 and 7 is `write`. This is expected: per the architecture, English rungs are not knob-driven procedural difficulty like maths, they're bank-tier selectors, and consecutive rungs legitimately reuse the same content pool while the *writing task* (the one part of the worksheet that's genuinely rung-specific prose, not a bank pick) carries the differentiation.
+Same `vt:'hard'`/`pt:3`/`gt:'hard'` tier selection as rung 6, but `gc` is now 6 (was 5, matching rung 6) — one more grammar-fix sentence per worksheet than rung 6, on top of the `write` differentiation below. Per the architecture, English rungs are mostly bank-tier selectors rather than knob-driven procedural difficulty like maths, so this small `gc` step plus the writing task together carry rung 7's escalation over rung 6.
 
 - `write:'argument'` → `WRITE_TASKS.argument`: "Answer this in a structured way: 'Is the main character... brave or just lucky?' Claim → 2 reasons with evidence → conclusion." This is a meaningfully different task shape from rung 6's `persuade` (which argues FOR/AGAINST a reading choice with a counter-reason) — rung 7 requires a claim-evidence-conclusion structure with **explicit named parts**, one level more formal than persuasive writing. That's the actual differentiation the plan calls for at this rung, and it lives in `WRITE_TASKS.argument`'s wording, not in a knob.
 

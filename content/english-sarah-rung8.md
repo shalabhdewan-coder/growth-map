@@ -1,12 +1,14 @@
 # Sarah — English — Rung 8 "Essay basics"
 
-**Knobs:** `{n:'Essay basics', vt:'hard', pt:3, gt:'hard', gc:5, write:'essay'}` — `eLevelTag` = "P6 · essay structure".
+**Knobs:** `{n:'Essay basics', vt:'hard', pt:3, gt:'hard', gc:7, write:'essay'}` — `eLevelTag` = "P6 · essay structure".
 
 See `content/english-sarah-rung1.md` for shared architecture; `-rung5.md`/`-rung6.md` for the PASSAGES tier-3 / VOCAB.hard / GRAMMAR.hard extensions this rung inherits.
 
+**2026-07-21 update:** an audit flagged rungs 6/7/8 as byte-identical on `vt/pt/gt/gc`, making Blocks A/C/D statistically indistinguishable across all three — only Block E's `write` prompt escalated. Fix: `gc` staggered 5→6→7 across rungs 6→7→8 (this rung bumped 5→7), so the grammar-fix block now genuinely grows alongside the writing-task escalation. `GRAMMAR.hard` has 20 entries, comfortably covering a draw of 7.
+
 ## What rung 8 tests (per its own knobs)
 
-Same tier selection as rungs 6-7 (`vt:'hard'`, `pt:3`, `gt:'hard'`, `gc:5`) — rung 8 is the last rung before the ladder switches to `vt:'harder'`/`tech:1` at rung 9 (out of scope for this batch, see dead-flag note below). Same reasoning as rung 7: the differentiation at this rung lives entirely in `write`.
+Same `vt:'hard'`/`pt:3`/`gt:'hard'` tier selection as rungs 6-7, but `gc` is now 7 (rung 6/7 are 5/6) — two more grammar-fix sentences than rung 6, one more than rung 7. Rung 8 is the last rung before the ladder switches to `vt:'harder'`/`tech:1` at rung 9 (out of scope for this batch, see dead-flag note below). Same reasoning as rung 7: the `write` task plus the `gc` step together carry the differentiation at this rung.
 
 - `write:'essay'` → `WRITE_TASKS.essay`: "Write a mini-essay (intro, one body paragraph, conclusion): 'What is the most important idea in ...'" — the most formally structured of the four writing tasks in this batch (multi → persuade → argument → essay is a genuine escalation: two linked paragraphs → persuasion with counter-reason → claim/evidence/conclusion → full intro/body/conclusion essay shape). This progression is real and was checked directly against the plan's rung-map intent, not assumed.
 
@@ -33,5 +35,5 @@ Checked every knob rungs 5-8 set (`vt`, `pt`, `gt`, `gc`, `write`, `n`) against 
 - Ran `ws_english_sarah(li, 'Test Book')` for `li` 4, 5, 6, 7 (rungs 5-8) via a Node harness built from the live file (script extracted up to the DOM-init tail, `module.exports` appended — same approach as prior rungs' verification): no `undefined`, `NaN`, or `[object Object]` in any of the four outputs.
 - Confirmed bank sizes post-edit: `VOCAB.hard.length === 16`, `GRAMMAR.hard.length === 20`, `PASSAGES.filter(p=>p.tier===3).length === 8`.
 - Sampled 30 draws of rung 7's passage block: all 8 distinct tier-3 passages appeared (2 original + 6 new), confirming the pool is actually being used, not silently falling back to a smaller tier.
-- Confirmed real differentiation across rungs 5-8 despite three of them (6-8) sharing identical `vt`/`pt`/`gt`/`gc`: rung 5 uses `mid` vocab (harder rungs use `hard`), and rungs 6/7/8 are distinguished entirely by their `write` task text (persuade → argument → essay), each verified to resolve to visibly different instructional wording in the generated worksheet.
+- Confirmed real differentiation across rungs 5-8: rung 5 uses `mid` vocab (harder rungs use `hard`), and rungs 6/7/8 share `vt`/`pt`/`gt` but are distinguished by both `write` task text (persuade → argument → essay) and `gc` (5→6→7, added 2026-07-21 after an audit found rungs 6-8 had been byte-identical on `gc` too) — verified `ws_english_sarah(5/6/7,...)` Block D produces 5/6/7 items respectively.
 - Also spot-checked rungs 1-4 still produce valid output after this batch's edits (no regression to earlier rungs from the shared-bank extensions).
