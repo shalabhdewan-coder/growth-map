@@ -1059,7 +1059,7 @@ function ws_english_sarah(li,book){const L=LEVELS.sarah.english[li];let blocks=[
  // D grammar
  const gr=shuf(GRAMMAR[effGt]).slice(0,L.gc),ga=[];
  blocks.push({h:'D. Fix the sentence (rewrite it correctly)',items:gr.map((g,i)=>(i+1)+')  '+g[0]),write:2});gr.forEach(g=>ga.push(g[1]));ans.push('D: '+ga.join('  '));
- // E technique — L.tech-gated (rungs 9-11 only). Teaches two rhetorical devices, asks the child to hunt
+ // E technique — L.tech-gated (rungs 9-12). Teaches two rhetorical devices, asks the child to hunt
  // for one in the Block C passage (or explain how the writer achieves a similar effect if neither appears
  // in that particular draw), then produce their own sentence using one device — direct prep for WRITE_TASKS.rhetoric.
  let wLetter='E';
