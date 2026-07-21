@@ -758,6 +758,14 @@ function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans
  // (NCERT ch.6 word problems run in the 20s-90s: shells, bangles, marbles, birds) and adds a third
  // kind — missing-addend ("56 birds ... a few more joined ... now there are 87 ... how many joined?"),
  // a genuinely new reasoning skill sourced straight from ch.6, not just bigger versions of add/subtract.
+ // story:1 (rungs 3-5) was itself a magnitude-dead flag the same way: it never read L.addMax/L.subMax
+ // at all, hardcoding 3-9/2-6 (add) and 6-12/1-5 (subtract) regardless of rung — so li4 "Within 100"
+ // (addMax:80, the rung whose whole point is arithmetic near 100, driving Blocks B/C up to 80) produced
+ // story numbers statistically identical to li2 "Add & take to 20" (addMax:20), two rungs and a 4x
+ // addMax jump earlier. Fixed: scales gently off L.addMax/L.subMax (gentler ceiling than story:2, which
+ // is reserved for the rung actually named "Story sums") using ratios chosen so li2/li3 (addMax/subMax:20)
+ // reproduce the exact original 3-9/2-6 and 6-12/1-5 ranges unchanged, while li4 (addMax/subMax:80)
+ // scales up proportionally into the 20s-40s instead of staying single-digit.
  if(L.story){
   if(L.story>=2){
    const kind=R(0,2),addCap=L.addMax||60,subCap=L.subMax||addCap;
@@ -765,7 +773,9 @@ function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans
    else if(kind===1){const a=R(Math.floor(subCap*0.5),subCap),b=R(10,a-5);blocks.push({h:'G. Story sum',items:[P(NAMES)+' had '+a+' bangles and gave away '+b+'. How many bangles left?  ____'],write:1});ans.push('G: '+(a-b));}
    else{const start=R(20,50),total=R(start+10,Math.max(start+11,addCap));blocks.push({h:'G. Story sum',items:[start+' birds were sitting on a tree. A few more joined. Now there are '+total+' birds. How many birds joined?  ____'],write:1});ans.push('G: '+(total-start));}
   }else{
-   const kind=R(0,1);if(kind===0){const a=R(3,9),b=R(2,6);blocks.push({h:'G. Story sum',items:[P(NAMES)+' has '+a+' balloons and gets '+b+' more. How many now?  ____'],write:1});ans.push('G: '+(a+b));}else{const a=R(6,12),b=R(1,5);blocks.push({h:'G. Story sum',items:[P(NAMES)+' had '+a+' sweets and ate '+b+'. How many left?  ____'],write:1});ans.push('G: '+(a-b));}
+   const kind=R(0,1),addCap=L.addMax||20,subCap=L.subMax||20;
+   if(kind===0){const a=R(3,Math.max(9,Math.floor(addCap*0.45))),b=R(2,Math.max(6,Math.floor(addCap*0.3)));blocks.push({h:'G. Story sum',items:[P(NAMES)+' has '+a+' balloons and gets '+b+' more. How many now?  ____'],write:1});ans.push('G: '+(a+b));}
+   else{const a=R(Math.max(6,Math.floor(subCap*0.3)),Math.max(12,Math.floor(subCap*0.6))),b=R(1,Math.max(5,Math.floor(subCap*0.25)));blocks.push({h:'G. Story sum',items:[P(NAMES)+' had '+a+' sweets and ate '+b+'. How many left?  ____'],write:1});ans.push('G: '+(a-b));}
   }
  }
  // H two-step — twostep:1 (rung9) was a magnitude-dead flag: it was read but a/b/c were hardcoded to
