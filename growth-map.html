@@ -989,12 +989,13 @@ function ws_english_sarah(li,book){const L=LEVELS.sarah.english[li];let blocks=[
  const vs=shuf(VOCAB[effVt]).slice(0,5),va=[];
  blocks.push({h:'A. Word Detective — write the meaning, then a sentence',items:vs.map((v,i)=>(i+1)+')  '+v[0]+'  —  meaning: ____________   sentence: ____________________'),write:0});
  vs.forEach(v=>va.push(v[0]+'='+v[1]));ans.push('A meanings: '+va.join('; '));
- // B about my book
+ // B about my book — no printed answer key exists (child's own book, open-ended), so it must not
+ // count toward MTOTAL/mastery — same fix pattern as science/mirayah Block A (commit 413d819).
  blocks.push({h:'B. About my book — “'+book+'”',items:[
    '1) Who is the main character? Describe them with two details.',
    '2) Write what happened in the part you read today (3–4 sentences).',
    '3) Find a word in your book you didn’t know. Write it + what you think it means.',
-   '4) What do you predict happens next? Why do you think so?'],write:2});
+   '4) What do you predict happens next? Why do you think so?'],write:2,ungraded:true});
  // C passage
  const pg=pickPassage(L.pt);
  blocks.push({h:'C. Reading — read &amp; answer',passage:pg.t,items:pg.q,write:2});ans.push('C: '+pg.a.join(' | '));
@@ -1016,8 +1017,8 @@ function ws_english_sarah(li,book){const L=LEVELS.sarah.english[li];let blocks=[
   ans.push('E techniques: '+td.map(d=>d.name+' = '+d.explain).join('; ')+' (Q3/Q4 open — accept any correctly identified device or grammatically sound original sentence using it)');
   wLetter='F';
  }
- // F/E writing
- blocks.push({h:wLetter+'. Writing challenge',items:[WRITE_TASKS[L.write](book)],write:6});
+ // F/E writing — free-response task with no printed answer key; must not count toward MTOTAL/mastery.
+ blocks.push({h:wLetter+'. Writing challenge',items:[WRITE_TASKS[L.write](book)],write:6,ungraded:true});
  return{title:'English Worksheet — Sarah (8)',sub:'Level '+(li+1)+'/'+LEVELS.sarah.english.length+' · '+L.n+'   ·   📖 '+book,level:eLevelTag(li),blocks,ans};}
 function eLevelTag(li){const map=['P3 · fact + vocab comprehension','P3–P4 · inference','P4 · vocab-in-context','P4 · opinion + reasoning','P5 · multi-paragraph writing','P5 · persuasive writing','P5–P6 · structured argument','P6 · essay structure','Rhetoric & technique','Debate — argue both sides','Personal-statement voice','Interview / seminar reasoning'];return map[li]||'Sarah English';}
 
