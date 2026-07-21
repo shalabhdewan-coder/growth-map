@@ -1306,7 +1306,16 @@ function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let bloc
    '2) One new word I learned:  ____________',
    '3) Draw your favourite part, then write about it.'],write:1,ungraded:true});
  // B sight words
- const sf=shuf(SIGHT[effWtier]).slice(0,4),sa=[];
+ // Rung 0 ('Sight words') has neither rhyme nor mini set, so Block B is the ONLY graded
+ // content on that rung (Block A is the ungraded "about my book" prompt) — MTOTAL was
+ // stuck at 4, and Math.ceil(4*0.8) rounds all the way up to 4, silently demanding a
+ // perfect 100% while the mastery modal still displayed "(80%+)". Every other rung has
+ // rhyme and/or mini adding more graded items so this never bit them. Fix: on that one
+ // content-bare rung, draw a 5th sight-word item from the SAME already-existing SIGHT
+ // bank (12 entries at every tier, so a 5th pick never runs short) so MTOTAL=5 and
+ // Math.ceil(5*0.8)=4 is a true, honest 80% bar — no new curriculum content invented.
+ const bCount=(L.rhyme||L.mini)?4:5;
+ const sf=shuf(SIGHT[effWtier]).slice(0,bCount),sa=[];
  const bLetter=nextLetter();
  blocks.push({h:bLetter+'. Fill the gap (circle the right word)',items:sf.map((s,i)=>(i+1)+')  '+s[0]+'   ('+shuf(s[1]).join('  /  ')+')')});
  sf.forEach(s=>sa.push(s[1][0]));ans.push(bLetter+': '+sa.join(', '));
