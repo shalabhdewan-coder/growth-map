@@ -48,3 +48,10 @@ The `L.twostep>=2` branch is rung 10's differentiated shape (this rung stays on 
 - Generated 8 sample worksheets via `ws_maths_mirayah(8)`: all produced 7 blocks (A,B,C,D,E,G,H — F/I still skipped, `shapes:0`/`place` unset) / 7 answer lines, no `undefined`/`NaN`/`[object Object]`.
 - **Block H magnitude now tracks the 99 ceiling** across 8 samples (e.g. `29 stickers + 18 more − 8 away = 39`, `44 + 22 − 25 = 41`, `24 + 6 − 9 = 21`) — a visible, order-of-magnitude jump from the pre-fix single-digit range, and every sample's `c<a+b` (no negative results).
 - Block E (groups) verified still capped correctly at this rung's own `mulMax:60` (see rung 10's file for why 60, not 40) — e.g. `5 baskets have 10 apples each = 50`, `6 baskets have 5 apples each = 30`, both ≤60.
+
+## Addendum — Block A "Number bonds to 100" plateau fixed (later audit pass)
+
+Same plateau bug documented in rung 7's file. **Fix:** this rung keeps `bondsForm:2` (tens-jump +
+ones-jump bridging, NCERT ch.6 p.53-54) and bumps `bondsReps:8` (up from rung 8's 7) — same reps-escalation
+rationale as rung 8's addendum. Verified via live generation: Block A produces 8 bridging items at this
+rung, distinct in count from rungs 7 (6) and 8 (7), all still capped at target<=100.

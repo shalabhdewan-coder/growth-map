@@ -239,10 +239,10 @@ const LEVELS={
    {n:'Teen numbers',       addMax:20, subMax:20, bonds:20, count:[2,5,10],  story:1, shapes:2, place:1},
    {n:'Within 100',         addMax:80, subMax:80, bonds:50, count:[5,10],    story:1, shapes:2, place:1},
    {n:'Story sums',         addMax:90, subMax:90, bonds:50, count:[2,5,10],  story:2, shapes:2, place:1},
-   {n:'Regrouping',         addMax:99, subMax:99, bonds:100, count:[10],      story:2, shapes:2, place:1, regroup:1},
-   {n:'Groups of 2·5·10',   addMax:99, subMax:99, bonds:100, count:[2,5,10],  story:2, shapes:0, mul:1, mulMax:40, regroup:1},
-   {n:'Two-step (little)',  addMax:99, subMax:99, bonds:100, count:[2,5,10],  story:2, shapes:0, mul:1, mulMax:60, twostep:1, regroup:2},
-   {n:'Bridge to big-girl', addMax:99, subMax:99, bonds:100, count:[3,4,6],   story:2, shapes:0, mul:1, mulMax:90, twostep:2, regroup:2}
+   {n:'Regrouping',         addMax:99, subMax:99, bonds:100, count:[10],      story:2, shapes:2, place:1, regroup:1, bondsForm:2, bondsReps:6},
+   {n:'Groups of 2·5·10',   addMax:99, subMax:99, bonds:100, count:[2,5,10],  story:2, shapes:0, mul:1, mulMax:40, regroup:1, bondsForm:2, bondsReps:7},
+   {n:'Two-step (little)',  addMax:99, subMax:99, bonds:100, count:[2,5,10],  story:2, shapes:0, mul:1, mulMax:60, twostep:1, regroup:2, bondsForm:2, bondsReps:8},
+   {n:'Bridge to big-girl', addMax:99, subMax:99, bonds:100, count:[3,4,6],   story:2, shapes:0, mul:1, mulMax:90, twostep:2, regroup:2, bondsForm:2, bondsReps:9}
   ],
   english:[
    {n:'Sight words',      wtier:'a', mini:0, write:'word'},
@@ -740,12 +740,29 @@ function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans
  // same numeric ceiling instead of silently generating the identical 6 items every time (rung 1→2 fix).
  // bondsForm:1 rotates which side of the equation is blank (x+__=target / __+y=target / target=x+__) so
  // "find the addend from either position" becomes a real, distinct fluency skill from rung 2 onward.
+ // bondsForm:2 (rungs 7-10, once regroup:1/2 is active) was a genuine plateau bug, not a deliberate
+ // design choice: bonds:100 + the plain x+__=target shape were set identically on all four of the
+ // ladder's hardest rungs, so Block A was statistically indistinguishable across 40% of the whole
+ // ladder while every other block (B/C forced carry/borrow, E multiplication, H two-step) was
+ // escalating hardest right there. Fixed with a genuinely new, sourced skill instead of a bigger
+ // number: NCERT ch.6 "Decoration for Festival" p.53-54 ("fill the boxes" number-line exercises,
+ // e.g. "22 + __ + __ = 38" solved as a ten-jump then a ones-jump) teaches bridging a gap between
+ // two 2-digit numbers by splitting it into a tens-jump + a ones-jump — the same "renaming"/regrouping
+ // chapter already cited for regroop:1/2 on these exact rungs, so it's not a new source, just a part
+ // of ch.6 this ladder hadn't used yet. bondsReps also steps up each rung (6→7→8→9) for genuine
+ // fluency growth on top of the new skill, matching the established rung1→2 reps precedent above.
  {let nb=[],a=[];const bTarget=L.bonds||10,reps=L.bondsReps||6;
-  for(let i=0;i<reps;i++){const x=R(1,bTarget-1),y=bTarget-x;let line,av;
-   const form=L.bondsForm?i%3:0;
-   if(form===1){line=(i+1)+')  ____ + '+y+' = '+bTarget;av=x;}
-   else if(form===2){line=(i+1)+')  '+bTarget+' = '+x+' + ____';av=y;}
-   else{line=(i+1)+')  '+x+' + ____ = '+bTarget;av=y;}
+  for(let i=0;i<reps;i++){let line,av;
+   if(L.bondsForm===2){
+    const s=R(11,Math.max(12,bTarget-19)),maxTensJump=Math.max(1,Math.floor((bTarget-s-9)/10)),
+      tensJump=R(1,maxTensJump)*10,onesJump=R(1,Math.min(9,bTarget-s-tensJump)),target=s+tensJump+onesJump;
+    line=(i+1)+')  '+s+' + ___ + ___ = '+target;av=tensJump+' & '+onesJump;
+   }else{
+    const x=R(1,bTarget-1),y=bTarget-x,form=L.bondsForm?i%3:0;
+    if(form===1){line=(i+1)+')  ____ + '+y+' = '+bTarget;av=x;}
+    else if(form===2){line=(i+1)+')  '+bTarget+' = '+x+' + ____';av=y;}
+    else{line=(i+1)+')  '+x+' + ____ = '+bTarget;av=y;}
+   }
    nb.push(line);a.push(av);}
   blocks.push({h:'A. Number bonds to '+bTarget,two:true,items:nb});ans.push('A: '+a.join(', '));}
  // B add — regroup:1 (rungs 6-7) forces real carrying (NCERT ch.6 "36+47=83": ones 6+7=13 carries a ten),

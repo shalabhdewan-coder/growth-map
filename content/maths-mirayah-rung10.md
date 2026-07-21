@@ -41,3 +41,15 @@ ans.push('H: '+(total-give));
 - **Block H now visibly differs from rung 9's shape** across 8 samples — multiplication-then-subtraction chains, e.g. `4 boxes with 6 pencils each = 24, gives away 9, left = 15`; `5 boxes with 4 pencils each = 20, gives away 12, left = 8`; `6 boxes with 3 pencils each = 18, gives away 6, left = 12` — confirming the `twostep:2` gate actually routes to the new branch and rung 9's plain add/subtract branch is not reused here.
 - Block E (groups) confirmed capped at this rung's `mulMax:90` with `per` drawn from `[3,4,6]` in every sample (e.g. `8 baskets have 4 apples each = 32`, `6 baskets have 6 apples each = 36`) — no product observed exceeding 90 across 8 samples (theoretical max for this rung's `arr`/`g` combination is well under the cap, as expected from the filter logic).
 - **Full-ladder regression (rungs 8-10 together, this task's closing requirement folded in early since all three share edited code paths):** all 3 rungs re-generated 8× each after the block-E/block-H rewrite — no failures, no dead answer/block-count mismatches, no cross-rung contamination (rung 8 never hits the `twostep` branch at all since the flag is unset there; rung 9 never hits the `twostep>=2` branch; rung 10 is the only one that does).
+
+## Addendum — Block A "Number bonds to 100" plateau fixed (later audit pass)
+
+Same plateau bug documented in rung 7's file — this was the last and most conspicuous rung in the flat
+run (the ladder's final rung, previously indistinguishable from rung 7's Block A three rungs earlier).
+**Fix:** `bondsForm:2` (tens-jump + ones-jump bridging, NCERT ch.6 p.53-54) plus `bondsReps:9` (the
+ladder's highest bonds-fluency rep count, up from rung 9's 8) — the terminal rung gets the most practice
+at the hardest bonds skill, consistent with every other block's own escalation curve peaking here.
+Verified via live generation: Block A produces 9 bridging items at this rung; before this fix, rungs
+7-10 were byte-for-byte-identical in shape (`x+____=100`, always 6 items) — now every one of the four
+back-half rungs is distinguishable by item count and all four share the qualitatively harder skill
+instead of the trivial single-blank complement.

@@ -41,3 +41,18 @@
 - **Every single generated block-C item across all 5 samples (30 items) required borrowing** (ones digit of subtrahend verified greater than minuend's in each, e.g. `36−29` (6<9), `92−67` (2<7), `77−69` (7<9)) — same standard, subtraction side now actually fixed.
 - No sum exceeded `addMax:99` and no subtraction went negative in any sample — the `R(a,b)` degenerate-range edge case from the old code no longer applies (both branches now guarantee valid ranges algebraically, not by luck).
 - Full-ladder regression: all 10 Mirayah maths rungs re-generated 8× each after this rung's edit — no failures, no dead answer/block-count mismatches.
+
+## Addendum — Block A "Number bonds to 100" plateau fixed (later audit pass)
+
+A later independent audit found `bonds:100` set identically on this rung and the three that follow it
+(rungs 8-10) with no format/reps escalation, making Block A statistically indistinguishable across
+40% of the ladder while every other block here was escalating hardest — an overlooked plateau, unlike
+this file's own deliberately-flat spots (e.g. `story`/`place` carried forward as "background maintenance").
+**Fix:** `bondsForm:2` on this rung switches Block A to a genuine new skill sourced from the *same* ch.6
+chapter already cited above (p.53-54, "fill the boxes" number-line exercises, e.g. `22 + __ + __ = 38`) —
+bridging the gap between a start number and a target by splitting it into a tens-jump plus a ones-jump,
+instead of the plain single-blank `x + __ = 100` used through rung 6. `bondsReps` stays at the default 6
+here (this rung is the skill's debut); rungs 8-10 step it up (7/8/9) for fluency on top of the same skill,
+mirroring the rung-1→2 reps precedent already used for Block A elsewhere in this file. Verified: `node --check`
+pass; live-generated samples confirm every Block A item at this rung now reads `s + ___ + ___ = target` with
+`target<=100` always and `tensJump>=10` always (never the old flat `x+____=100` form).

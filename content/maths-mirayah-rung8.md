@@ -46,3 +46,14 @@ if(L.mul){const arr=L.count||[2,5,10],mCap=L.mulMax||40,g=R(2,8),permax=Math.max
 - `node --check` on the extracted `<script>` block: pass, no output.
 - Generated 8 sample worksheets via `ws_maths_mirayah(7)`: all produced 6 blocks (A,B,C,D,E,G — F skipped since `shapes:0`, H/I skipped since `twostep`/`place` unset at this rung) / 6 answer lines, no `undefined`/`NaN`/`[object Object]`.
 - **Every generated block-E product across 8 samples stayed ≤40** (e.g. `4 baskets have 5 apples each = 20`, `7 baskets have 5 apples each = 35`, `2 baskets have 10 apples each = 20`, `8 baskets have 2 apples each = 16`) — matches the MOE 3.3 "multiplying within 40" ceiling exactly, and `per` was drawn from `[2,5,10]` in every sample (rung 8's own `count` array), confirming the `L.count` read now actually drives the value instead of the old hardcoded array.
+
+## Addendum — Block A "Number bonds to 100" plateau fixed (later audit pass)
+
+Same plateau bug documented in rung 7's file: `bonds:100` was identical across rungs 7-10 with zero
+Block A escalation across the entire back half of the ladder. **Fix:** this rung keeps `bondsForm:2`
+(the tens-jump + ones-jump bridging skill introduced at rung 7, sourced from NCERT ch.6 p.53-54) and
+bumps `bondsReps:7` (up from rung 7's 6) — consistent with this rung's own "background maintenance,
+not the new focus" framing above for add/subtract: Block A's *skill* doesn't need to change again this
+rung (rung 8's new focus is multiplication/grouping), but reps step up for genuine fluency growth rather
+than silently repeating rung 7's exact item count. Verified via live generation: Block A now produces 7
+bridging items at this rung vs 6 at rung 7, both distinct from the pre-fix flat `x+____=100` shape.
