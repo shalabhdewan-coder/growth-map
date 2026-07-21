@@ -1448,7 +1448,17 @@ function levelRail(gk,sk){const lad=LEVELS[gk][sk],here=LEVEL[gk][sk];let r='<di
  /* science ladders run out of real escalation once boost saturates every sc/method item
     (see sciMaxUsefulBoost) — don't claim "no ceiling" once further tiers are content-identical */
  const sciSaturated=sk==='science'&&typeof L.boost==='number'&&L.boost>=sciMaxUsefulBoost(L);
- const topMsg=sciSaturated?' · 🔁 full material reached — same bank, fresh shuffle each sheet':' · 🚀 no ceiling — keeps climbing';
+ /* Sarah's English ladder-extension rungs plateau too: vt caps at 'expert' (boost>=3) and pt is
+    already pinned to tier 4 by intensifyRung, but gc (Block D grammar-fix count) keeps growing
+    arithmetically forever with no cap of its own — it's just silently truncated by slice() once
+    it reaches the real GRAMMAR[effGt] bank size. L.gc already reflects intensifyRung's scaled
+    value, so comparing it straight against the bank length (no formula reversal needed) tells us
+    exactly when further boosting stops changing the graded content — see growth-map-exhaustive-
+    audit finding "LEVELS.sarah.english — Independent Study ladder-extension saturation vs. UI
+    honesty" (verified live: MTOTAL plateaus at 36 from boost=10 onward). */
+ const engSarahSaturated=sk==='english'&&gk==='sarah'&&typeof L.boost==='number'&&L.gc>=GRAMMAR[effTier(GT_ORDER,L.gt,L.boost)].length;
+ const saturated=sciSaturated||engSarahSaturated;
+ const topMsg=saturated?' · 🔁 full material reached — same bank, fresh shuffle each sheet':' · 🚀 no ceiling — keeps climbing';
  r+='<div class="lvline">Rung <b>'+(here+1)+(beyond?'':' of '+BASE_LADDER_LEN[gk][sk])+'</b> — '+L.n+(top?topMsg:' · next: '+lad[here+1].n)+'</div>';
  return r;}
 
