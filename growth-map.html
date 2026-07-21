@@ -552,7 +552,7 @@ const LADDER={
 };
 function curBook(gk){const st=BOOK[gk],L=LADDER[gk];if(st.custom!=null&&st.custom.trim()!=='')return st.custom;return st.idx<L.length?L[st.idx]:'(type your next book)';}
 function nextTitles(gk,n){const st=BOOK[gk],L=LADDER[gk];return L.slice(st.idx+1,st.idx+1+n).map(t=>t.split(' — ')[0]);}
-function finishBook(gk){const raw=(document.getElementById('bookin-'+gk).value||curBook(gk));const isCustom=BOOK[gk].custom!=null&&BOOK[gk].custom.trim()!=='';const t=(isCustom?raw:raw.split(' — ')[0]).trim();if(t)BOOK[gk].done.push(t);BOOK[gk].idx++;BOOK[gk].custom=null;save();renderSub(gk,'english');makeWS(gk,'english');toast('📚 Book shelved! Next book + a fresh sheet ready.');}
+function finishBook(gk){const st=BOOK[gk],L=LADDER[gk];const isCustom=st.custom!=null&&st.custom.trim()!=='';if(!isCustom&&st.idx>=L.length){toast('✍️ Type your next book title first!');return;}const raw=(document.getElementById('bookin-'+gk).value||curBook(gk));const t=(isCustom?raw:raw.split(' — ')[0]).trim();if(t)st.done.push(t);st.idx++;st.custom=null;save();renderSub(gk,'english');makeWS(gk,'english');toast('📚 Book shelved! Next book + a fresh sheet ready.');}
 function nextBook(gk){BOOK[gk].idx++;BOOK[gk].custom=null;save();renderSub(gk,'english');toast('⤳ Skipped to the next book.');}
 function bookPanel(gk){const st=BOOK[gk];let h='<div class="bookzone"><div class="sect">📖 Book I’m reading now</div>';
  h+='<input class="bookin" id="bookin-'+gk+'" value="'+curBook(gk).replace(/"/g,'&quot;')+'" data-bookinput="'+gk+'">';
