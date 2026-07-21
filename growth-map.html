@@ -488,6 +488,15 @@ function intensifyRung(base,tier){
  if('pt' in k)k.pt=Math.min(k.pt,4); // pin to the hardest defined PASSAGES tier — beyond 4, pickPassage() falls back to ALL tiers (including tier-1) instead of staying hard
  return k;
 }
+/* Science ladders have no numeric knob for intensifyRung to scale (vocab/facts/sc/method are
+   string-pair banks), so ws_science_sarah/mirayah widen those SAME banks as boost rises instead
+   (full vocab+facts, then guaranteed-hardest-first sc/method up to all items). That widening runs
+   out once boost reaches each bank's own size — sc/method (the last knob left) stop changing once
+   boost>=length-1, since by then every item in the bank is already shown every time (only shuffle
+   order still varies). Past that point further Independent Study tiers are content-identical, so
+   levelRail() below must stop claiming indefinite escalation for a saturated science ladder — see
+   growth-map-exhaustive-audit finding "science/mirayah — Independent Study tier escalation". */
+function sciMaxUsefulBoost(L){return Math.max((L.sc?L.sc.length:1)-1,(L.method?L.method.length:1)-1);}
 
 /* ===== STATE (this is your editable starting point) ===== */
 const LEVEL={
@@ -605,7 +614,7 @@ function m_bar(L){const t=L.bar||'cmp';const fmtB=p=>Math.floor(p/100)+'.'+Strin
  if(t==='dec'){const aP=R(3,18)*5,bP=R(3,18)*5,totP=aP+bP;return{h:'C. Bar-model challenge — draw the bars',items:[P(NAMES)+' spent ₹'+fmtB(totP)+' in total on a toy and a comic. The toy cost ₹'+fmtB(aP)+'. Draw a bar split into two parts to find how much the comic cost.'],write:3,a:'C: ₹'+fmtB(bP)};}
  if(t==='frac'){const d=P([3,4,5]),k=R(3,7),whole=d*k,num=R(1,d-1),got=num*k;return{h:'C. Bar-model challenge — draw the bars',items:[num+'/'+d+' of a number is '+got+'. Draw a bar in '+d+' equal parts to find the whole number.'],write:3,a:'C: whole = '+whole};}
  if(t==='ratio'){const k=R(2,6),x=P([2,4]),y=P([3,5]),tot=(x+y)*k;return{h:'C. Bar-model challenge — draw the bars',items:['Two teams share '+tot+' points in the ratio '+x+':'+y+'. Draw '+(x+y)+' equal boxes to find each team’s score.'],write:3,a:'C: '+(x*k)+' and '+(y*k)};}
- if(t==='ratio3'){const k=R(2,5),x=P([1,2]),y=P([2,3]),z=P([3,4]),tot=(x+y+z)*k;return{h:'C. Bar-model challenge — draw the bars',items:['Three friends share ₹'+tot+' in the ratio '+x+':'+y+':'+z+'. Draw '+(x+y+z)+' equal boxes to find each friend’s share.'],write:3,a:'C: ₹'+(x*k)+', ₹'+(y*k)+' and ₹'+(z*k)};}
+ if(t==='ratio3'){const k=R(2,5),x=P([1,2]),y=P([3,4]),z=P([5,6]),tot=(x+y+z)*k;return{h:'C. Bar-model challenge — draw the bars',items:['Three friends share ₹'+tot+' in the ratio '+x+':'+y+':'+z+'. Draw '+(x+y+z)+' equal boxes to find each friend’s share.'],write:3,a:'C: ₹'+(x*k)+', ₹'+(y*k)+' and ₹'+(z*k)};}
  if(t==='pct'){const O=R(3,9)*10,pc=P([10,20,50]);const paid=O*(100-pc)/100;return{h:'C. Bar-model challenge — draw the bars',items:['After a '+pc+'% discount a jacket costs ₹'+fmtB(paid*100)+'. Draw a bar split into 100 to find the original price.'],write:3,a:'C: original = ₹'+O};}
  const tot=(L.mul2?R(20,40):R(8,15))*2,d=(L.mul2?R(5,12):R(2,7))*2,big=(tot+d)/2,sm=(tot-d)/2;return{h:'C. Bar-model challenge — draw the bars',items:['Two friends share '+tot+' stickers. One has '+d+' more than the other. How many does each have?'],write:3,a:'C: '+big+' and '+sm};}
 
@@ -1387,7 +1396,12 @@ function levelRail(gk,sk){const lad=LEVELS[gk][sk],here=LEVEL[gk][sk];let r='<di
  for(let i=0;i<lad.length;i++)r+='<span class="rung'+(i<=here?' on':'')+(i===here?' here':'')+'" title="'+lad[i].n+'"></span>';
  r+='</div>';
  const top=here>=lad.length-1,beyond=here>=BASE_LADDER_LEN[gk][sk];
- r+='<div class="lvline">Rung <b>'+(here+1)+(beyond?'':' of '+BASE_LADDER_LEN[gk][sk])+'</b> — '+lad[here].n+(top?' · 🚀 no ceiling — keeps climbing':' · next: '+lad[here+1].n)+'</div>';
+ const L=lad[here];
+ /* science ladders run out of real escalation once boost saturates every sc/method item
+    (see sciMaxUsefulBoost) — don't claim "no ceiling" once further tiers are content-identical */
+ const sciSaturated=sk==='science'&&typeof L.boost==='number'&&L.boost>=sciMaxUsefulBoost(L);
+ const topMsg=sciSaturated?' · 🔁 full material reached — same bank, fresh shuffle each sheet':' · 🚀 no ceiling — keeps climbing';
+ r+='<div class="lvline">Rung <b>'+(here+1)+(beyond?'':' of '+BASE_LADDER_LEN[gk][sk])+'</b> — '+L.n+(top?topMsg:' · next: '+lad[here+1].n)+'</div>';
  return r;}
 
 function panelHTML(gk,sk){const g=DATA[gk],s=g.subjects[sk];const li=LEVEL[gk][sk],lad=LEVELS[gk][sk];let h='';
