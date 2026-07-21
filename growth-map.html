@@ -753,7 +753,7 @@ function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans
  // shapes
  if(L.shapes){const sh=P([['3 sides','triangle'],['4 equal sides','square'],['round, no corners','circle'],['4 sides, 2 long & 2 short','rectangle']]);blocks.push({h:'F. Shape detective',items:['Draw a shape with '+sh[0]+'. What is it called? ____________']});ans.push('F: '+sh[1]);}
  // story sums — story:1 (rungs 3-5) keeps the original small within-20 shape unchanged.
- // story:2 (rungs 6-7) was a dead-flag: the value 2 vs 1 was never actually read, so "Story sums"
+ // story:2 (rungs 6-10) was a dead-flag: the value 2 vs 1 was never actually read, so "Story sums"
  // generated identical numbers to earlier rungs. Fixed: story:2 scales magnitude off addMax/subMax
  // (NCERT ch.6 word problems run in the 20s-90s: shells, bangles, marbles, birds) and adds a third
  // kind — missing-addend ("56 birds ... a few more joined ... now there are 87 ... how many joined?"),
