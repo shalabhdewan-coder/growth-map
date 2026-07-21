@@ -746,11 +746,17 @@ function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans
  // tiny numbers a much easier rung would (same bug class as story:2 at rung 6 / place at rung 4). Fixed:
  // magnitude now derives from cap=max(addMax,subMax). twostep:2 (rung10) gets a differentiated shape —
  // multiply-then-subtract, previewing Sarah's own rung-1 two-step (see content/maths-sarah-rung1.md) —
- // rather than just bigger versions of rung 9's plain add/subtract chain.
+ // rather than just bigger versions of rung 9's plain add/subtract chain. That branch itself then had
+ // the SAME dead-cap bug: it computed `cap` above but never read it, and hardcoded g=R(3,6) with per
+ // drawn straight from L.count (chosen for block D's skip-counting, not magnitude) — so rung10's total
+ // topped out at 6×6=36 regardless of its mulMax:90, making the "hardest" rung's totals smaller than
+ // rung9's. Fixed: per is still drawn from L.count (kept, matches block D) but g is now derived from
+ // mulMax (capped at 20 boxes so the story stays plausible) so g*per ranges roughly 45-90, actually
+ // approaching the rung's stated ceiling instead of maxing out at 36.
  if(L.twostep){
   const cap=Math.max(L.addMax||30,L.subMax||30);
   if(L.twostep>=2&&L.mul){
-   const arr=L.count||[2,5,10],per=P(arr),g=R(3,6),total=g*per,give=R(2,Math.max(2,Math.min(total-3,20)));
+   const arr=L.count||[3,4,6],mCap=L.mulMax||90,per=P(arr),gmax=Math.min(20,Math.max(per,Math.floor(mCap/per))),gmin=Math.max(per,Math.floor(gmax*0.6)),g=R(gmin,gmax),total=g*per,give=R(10,Math.max(11,Math.min(total-5,40)));
    blocks.push({h:'H. Two-step story',items:[P(NAMES)+' packs '+g+' boxes with '+per+' pencils in each box, then gives away '+give+' pencils. How many pencils are left?  ____'],write:1});
    ans.push('H: '+(total-give));
   }else{
