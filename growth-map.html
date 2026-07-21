@@ -1245,7 +1245,7 @@ function ws_science_mirayah(li){const L=SCI_MIRAYAH[li];let blocks=[],ans=[];
  const me=boost?[L.method[L.method.length-1]].concat(shuf(L.method.slice(0,-1)).slice(0,Math.min(L.method.length,1+boost)-1)):[P(L.method)];
  blocks.push({h:'D. Little scientist — guess, then test 🔎',items:me.map(m=>m[0]),write:1});
  ans.push('D: '+me.map(m=>m[1]).join(' | '));
- blocks.push({h:'E. Try it (with a grown-up)',items:[L.lab],write:1});
+ blocks.push({h:'E. Try it (with a grown-up)',items:[L.lab],write:1,ungraded:true});
  return{title:'Science Worksheet — Mirayah (6)',sub:'Level '+(li+1)+'/'+SCI_MIRAYAH.length+' · '+L.n,level:mirayahSciLevelTag(li),blocks,ans};}
 
 /* ---------- LANE PRACTICE CARDS (Swimming · Music · Riding · Madhurim) ---------- */
