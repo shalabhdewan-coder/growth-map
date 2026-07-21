@@ -234,7 +234,7 @@ const LEVELS={
  mirayah:{
   maths:[
    {n:'Counting play',      addMax:10, bonds:10, count:[2],        story:0, shapes:1},
-   {n:'Bonds to 10',        addMax:16, subMax:5, bonds:10, count:[5],      story:0, shapes:1},
+   {n:'Bonds to 10',        addMax:16, subMax:5, bonds:10, count:[5],      story:0, shapes:1, bondsReps:9, bondsForm:1},
    {n:'Add & take to 20',   addMax:20, subMax:20, bonds:20, count:[2,5],     story:1, shapes:1},
    {n:'Teen numbers',       addMax:20, subMax:20, bonds:20, count:[2,5,10],  story:1, shapes:2, place:1},
    {n:'Within 100',         addMax:80, subMax:80, bonds:50, count:[5,10],    story:1, shapes:2, place:1},
@@ -736,8 +736,18 @@ function mLevelTag(li){const map=['Singapore P3 · fluency + 2-step','Singapore 
 
 /* ---------- MATHS · MIRAYAH ---------- */
 function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans=[];
- // A number bonds
- {let nb=[],a=[];for(let i=0;i<6;i++){const x=R(1,(L.bonds||10)-1);nb.push((i+1)+')  '+x+' + ____ = '+(L.bonds||10));a.push((L.bonds||10)-x);}blocks.push({h:'A. Number bonds to '+(L.bonds||10),two:true,items:nb});ans.push('A: '+a.join(', '));}
+ // A number bonds — bondsReps (default 6) lets a later rung ask for more repetition/fluency at the
+ // same numeric ceiling instead of silently generating the identical 6 items every time (rung 1→2 fix).
+ // bondsForm:1 rotates which side of the equation is blank (x+__=target / __+y=target / target=x+__) so
+ // "find the addend from either position" becomes a real, distinct fluency skill from rung 2 onward.
+ {let nb=[],a=[];const bTarget=L.bonds||10,reps=L.bondsReps||6;
+  for(let i=0;i<reps;i++){const x=R(1,bTarget-1),y=bTarget-x;let line,av;
+   const form=L.bondsForm?i%3:0;
+   if(form===1){line=(i+1)+')  ____ + '+y+' = '+bTarget;av=x;}
+   else if(form===2){line=(i+1)+')  '+bTarget+' = '+x+' + ____';av=y;}
+   else{line=(i+1)+')  '+x+' + ____ = '+bTarget;av=y;}
+   nb.push(line);a.push(av);}
+  blocks.push({h:'A. Number bonds to '+bTarget,two:true,items:nb});ans.push('A: '+a.join(', '));}
  // B add — regroup:1 (rungs 6-7) forces real carrying (NCERT ch.6 "36+47=83": ones 6+7=13 carries a ten),
  // not merely allow it: ones digits are picked so xo+yo>=10 every time, tens picked so the sum stays <=cap.
  // regroup:2 (rungs 8-9 "Two-step (little)"/"Bridge to big-girl") was previously identical to regroup:1 —
