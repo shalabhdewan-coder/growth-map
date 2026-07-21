@@ -646,8 +646,11 @@ function m_mistake(L){const easy=[
  const algebraBank=[
   ['A child wrote:  ▢ + 6 = 15, so ▢ = 15 + 6 = 21.  Find the mistake and fix it.','wrong — to undo “+6” you subtract 6, not add: ▢ = 15 − 6 = 9'],
   ['A child wrote:  3x = 21, so x = 21 + 3 = 24.  Find the mistake and fix it.','wrong — to undo “×3” you divide by 3, not add: x = 21 ÷ 3 = 7']];
+ const longmulBank=[
+  ['A child worked out 34 × 26 like this:  34 × 6 = 204,  then 34 × 2 = 68,  then 204 + 68 = 272.  Find the mistake and fix it.','wrong — the “2” is really 2 tens (20), so that partial product must be shifted one place left: 34 × 20 = 680, not 68; correct total = 204 + 680 = 884']];
  let bank=(L.chal>=3)?hard:easy;
  if(L.frac&&L.chal<3)bank=bank.concat(fracEasy);
+ if(L.longmul)bank=bank.concat(longmulBank);
  if(L.dec)bank=bank.concat(decBank);
  if(L.ratio)bank=bank.concat(ratioBank);
  if(L.pct)bank=bank.concat(pctBank);
