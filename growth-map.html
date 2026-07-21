@@ -1146,7 +1146,7 @@ function ws_science_mirayah(li){const L=SCI_MIRAYAH[li];let blocks=[],ans=[];
  // already in this rung's own banks harder as tier rises.
  const boost=L.boost||0;
  const vs=shuf(L.vocab).slice(0,boost?L.vocab.length:2);
- blocks.push({h:'A. New words — say it, then draw it',items:vs.map((v,i)=>(i+1)+')  '+v[0]+'  —  '+v[1])});
+ blocks.push({h:'A. New words — say it, then draw it',items:vs.map((v,i)=>(i+1)+')  '+v[0]+'  —  '+v[1]),ungraded:true});
  const fs=shuf(L.facts).slice(0,boost?L.facts.length:4);
  blocks.push({h:'B. What do you know?',items:fs.map((f,i)=>(i+1)+')  '+f[0]),write:1});
  ans.push('B: '+fs.map((f,i)=>(i+1)+') '+f[1]).join('  '));
@@ -1239,7 +1239,7 @@ function stepDown(gk,sk){const lad=LEVELS[gk][sk];if(LEVEL[gk][sk]>0){LEVEL[gk][
 
 /* ===== MASTERY GATE: level-up on an academic subject requires a scored worksheet ===== */
 let MGK=null, MSK=null, MTOTAL=0;
-function wsQuestionCount(ws){return ws.blocks.reduce((n,b)=>n+(b.items?b.items.length:0),0);}
+function wsQuestionCount(ws){return ws.blocks.reduce((n,b)=>n+((b.items&&!b.ungraded)?b.items.length:0),0);}
 function openMasteryCheck(gk,sk){
  if(CURGK!==gk||CURSK!==sk||!CURWS){toast('Press “Make worksheet” first, mark it against the answer key, then Done.');return;}
  MGK=gk;MSK=sk;MTOTAL=wsQuestionCount(CURWS)||1;
