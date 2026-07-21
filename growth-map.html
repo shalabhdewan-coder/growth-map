@@ -223,8 +223,8 @@ const LEVELS={
    {n:'Opinion & why',        vt:'mid',   pt:2, gt:'hard', gc:4, write:'opinion'},
    {n:'Multi-paragraph',      vt:'mid',   pt:3, gt:'hard', gc:4, write:'multi'},
    {n:'Persuasive writing',   vt:'hard',  pt:3, gt:'hard', gc:5, write:'persuade'},
-   {n:'Structure & argument', vt:'hard',  pt:3, gt:'hard', gc:5, write:'argument'},
-   {n:'Essay basics',         vt:'hard',  pt:3, gt:'hard', gc:5, write:'essay'},
+   {n:'Structure & argument', vt:'hard',  pt:3, gt:'hard', gc:6, write:'argument'},
+   {n:'Essay basics',         vt:'hard',  pt:3, gt:'hard', gc:7, write:'essay'},
    {n:'Rhetoric & technique', vt:'harder',pt:3, gt:'hard', gc:5, write:'rhetoric', tech:1},
    {n:'Debate — both sides',  vt:'harder',pt:3, gt:'hard', gc:5, write:'debate',   tech:1},
    {n:'Personal voice',       vt:'harder',pt:3, gt:'hard', gc:5, write:'personal', tech:1},
@@ -485,6 +485,7 @@ function intensifyRung(base,tier){
  k._root=root;k.n=root+' — Independent Study '+tier;k.boost=tier;
  for(const key in k){if(typeof k[key]==='number'&&key!=='chal'&&key!=='boost')k[key]=Math.ceil(k[key]*(1+0.15*tier));}
  if('chal' in k)k.chal=6; // pin to the hardest defined challenge bank rather than overshoot into an undefined one
+ if('pt' in k)k.pt=Math.min(k.pt,4); // pin to the hardest defined PASSAGES tier — beyond 4, pickPassage() falls back to ALL tiers (including tier-1) instead of staying hard
  return k;
 }
 
