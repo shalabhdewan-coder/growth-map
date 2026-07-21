@@ -1135,17 +1135,27 @@ function ws_science_sarah(li){const L=SCI_SARAH[li];let blocks=[],ans=[];
  blocks.push({h:'E. Try it at home (safe — with a grown-up)',items:[L.lab],write:2});
  return{title:'Science Worksheet — Sarah (8)',sub:'Level '+(li+1)+'/'+SCI_SARAH.length+' · '+L.n,level:sciLevelTag(li),blocks,ans};}
 function ws_science_mirayah(li){const L=SCI_MIRAYAH[li];let blocks=[],ans=[];
- const vs=shuf(L.vocab).slice(0,2);
+ // `boost` is only ever set by intensifyRung on synthetic "Independent Study" rungs past
+ // BASE_LADDER_LEN (undefined on hand-authored rungs 1-10). Science rungs carry no numeric knob
+ // (vocab/facts/sc/method are string-pair arrays, lab is a string) for intensifyRung's generic
+ // scaling loop to touch, so every Independent Study tier used to silently re-serve rung 10
+ // unchanged (same bug as ws_science_sarah, fixed in commit a604c65). Fix: once boosted, widen
+ // the SAME existing banks instead — full vocab + fact lists (vs the base 2/4-item slice), and
+ // guarantee the hardest (last-index) sc/method question plus extra ones as tier climbs, up to
+ // all 3 already written per rung. No new curriculum content invented — just using material
+ // already in this rung's own banks harder as tier rises.
+ const boost=L.boost||0;
+ const vs=shuf(L.vocab).slice(0,boost?L.vocab.length:2);
  blocks.push({h:'A. New words — say it, then draw it',items:vs.map((v,i)=>(i+1)+')  '+v[0]+'  —  '+v[1])});
- const fs=shuf(L.facts).slice(0,4);
+ const fs=shuf(L.facts).slice(0,boost?L.facts.length:4);
  blocks.push({h:'B. What do you know?',items:fs.map((f,i)=>(i+1)+')  '+f[0]),write:1});
  ans.push('B: '+fs.map((f,i)=>(i+1)+') '+f[1]).join('  '));
- const sc=P(L.sc);
- blocks.push({h:'C. Look & think',items:[sc[0]],write:1});
- ans.push('C: '+sc[1]);
- const me=P(L.method);
- blocks.push({h:'D. Little scientist — guess, then test 🔎',items:[me[0]],write:1});
- ans.push('D: '+me[1]);
+ const sc=boost?[L.sc[L.sc.length-1]].concat(shuf(L.sc.slice(0,-1)).slice(0,Math.min(L.sc.length,1+boost)-1)):[P(L.sc)];
+ blocks.push({h:'C. Look & think',items:sc.map(s=>s[0]),write:1});
+ ans.push('C: '+sc.map(s=>s[1]).join(' | '));
+ const me=boost?[L.method[L.method.length-1]].concat(shuf(L.method.slice(0,-1)).slice(0,Math.min(L.method.length,1+boost)-1)):[P(L.method)];
+ blocks.push({h:'D. Little scientist — guess, then test 🔎',items:me.map(m=>m[0]),write:1});
+ ans.push('D: '+me.map(m=>m[1]).join(' | '));
  blocks.push({h:'E. Try it (with a grown-up)',items:[L.lab],write:1});
  return{title:'Science Worksheet — Mirayah (6)',sub:'Level '+(li+1)+'/'+SCI_MIRAYAH.length+' · '+L.n,level:'Age 6 · science through observing & wondering (joy first)',blocks,ans};}
 
