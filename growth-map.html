@@ -682,7 +682,8 @@ function m_algebra(L){const B=[],a=[];const bo=L.boost||0;
    const b2=P(cand),disp=grid.map((v,i)=>(i===r1||i===b2)?'?':v);
    const rows=[[0,1,2],[3,4,5],[6,7,8]].map(row=>row.map(i=>disp[i]).join('  ')).join('<br>');
    B.push('5)  Magic square — every row, column and diagonal adds to the same total. Use the row/column totals to find the two missing numbers (?):<br>'+rows);
-   a.push('missing = '+grid[r1]+' and '+grid[b2]);}
+   const[lo,hi]=[r1,b2].sort((x,y)=>x-y);
+   a.push('missing = '+grid[lo]+' and '+grid[hi]);}
  return{h:'F. Algebra — find the unknown (show your working)',items:B,write:2,a:'F: '+a.join('; ')};}
 
 function m_geometry(L){const n=(L&&L.comp)?5:4,opt=R(0,n-1),bo=(L&&L.boost)||0;
