@@ -226,9 +226,9 @@ const LEVELS={
    {n:'Structure & argument', vt:'hard',  pt:3, gt:'hard', gc:6, write:'argument'},
    {n:'Essay basics',         vt:'hard',  pt:3, gt:'hard', gc:7, write:'essay'},
    {n:'Rhetoric & technique', vt:'harder',pt:3, gt:'hard', gc:5, write:'rhetoric', tech:1},
-   {n:'Debate — both sides',  vt:'harder',pt:3, gt:'hard', gc:5, write:'debate',   tech:1},
-   {n:'Personal voice',       vt:'harder',pt:3, gt:'hard', gc:5, write:'personal', tech:1},
-   {n:'Interview reasoning',  vt:'harder',pt:3, gt:'hard', gc:5, write:'interview',tech:1}
+   {n:'Debate — both sides',  vt:'harder',pt:3, gt:'hard', gc:6, write:'debate',   tech:1},
+   {n:'Personal voice',       vt:'harder',pt:3, gt:'hard', gc:7, write:'personal', tech:1},
+   {n:'Interview reasoning',  vt:'harder',pt:3, gt:'hard', gc:8, write:'interview',tech:1}
   ]
  },
  mirayah:{
@@ -1014,6 +1014,14 @@ const WRITE_TASKS={
 // re-confirmed in rungs 5-8's audits). Fixed by wiring a real "Spot the technique" block off it, directly
 // matching WRITE_TASKS.rhetoric's own instruction to "use at least one rhetorical question and one rule of
 // three" — the block teaches/drills the exact devices the writing task then asks the child to produce.
+// NOTE: tech:1 being identical on all of rungs 9-12 only differentiates rung 8 (no Block E) from rung 9+
+// (has Block E) — it does NOT differentiate rungs 9/10/11/12 from each other, since Block E always draws
+// 2 random RHETORIC items regardless of rung. Combined with vt/pt/gt all being identical too, and the
+// writing-challenge block being ungraded:true (commit 4bd9ee8), the graded MTOTAL (Blocks A/C/D/E) was
+// byte-identical across all four rungs (20/20/20/20) — the mastery gate advanced a child through 4 rungs
+// on literally the same graded difficulty each time. Fixed the same way rungs 6-8 were staggered
+// (commit 67e6797): gc (Block D grammar-fix count) now climbs 5→6→7→8 across rungs 9-12, so Block D — and
+// therefore MTOTAL — actually grows each rung instead of staying flat.
 const RHETORIC=[
  {name:'Rhetorical question',explain:'a question asked to make a point, not to get a real answer',example:'“Isn’t it obvious that reading makes you smarter?”'},
  {name:'Rule of three',explain:'listing three things together to make an idea feel complete and powerful',example:'“Fast, fun and unforgettable.”'},
