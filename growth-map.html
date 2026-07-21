@@ -535,8 +535,8 @@ function bookPanel(gk){const st=BOOK[gk];let h='<div class="bookzone"><div class
    ============================================================ */
 
 /* ---------- MATHS · SARAH ---------- */
-function m_warm(L){let items=[],a=[];const bo=L.boost||0;const specials=[];if(L.frac)specials.push('frac');if(L.longmul)specials.push('longmul');if(L.mul2)specials.push('mul2');if(L.dec)specials.push('dec');if(L.ratio)specials.push('ratio');if(L.pct)specials.push('pct');
- for(let i=0;i<6;i++){const n=i+1,pick=R(0,2);const kind=(pick===0&&specials.length)?P(specials):(pick===1?'div':'mul');
+function m_warm(L){let items=[],a=[];const bo=L.boost||0;const wc=L.wm||6;const specials=[];if(L.frac)specials.push('frac');if(L.longmul)specials.push('longmul');if(L.mul2)specials.push('mul2');if(L.dec)specials.push('dec');if(L.ratio)specials.push('ratio');if(L.pct)specials.push('pct');
+ for(let i=0;i<wc;i++){const n=i+1,pick=R(0,2);const kind=(pick===0&&specials.length)?P(specials):(pick===1?'div':'mul');
   if(kind==='frac'){const d=P([2,3,4,5]),k=R(2,7+bo),whole=d*k,num=R(1,d-1);items.push(n+')  '+num+'/'+d+' of '+whole+' = ____');a.push(num*k);}
   else if(kind==='longmul'){const x=R(12,29+3*bo),y=R(11,19+2*bo);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
   else if(kind==='mul2'){const x=R(11,29+3*bo),y=R(3,9+bo);items.push(n+')  '+x+' × '+y+' = ____');a.push(x*y);}
