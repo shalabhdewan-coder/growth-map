@@ -728,7 +728,13 @@ function ws_maths_sarah(li){const L=LEVELS.sarah.maths[li];let blocks=[],ans=[];
  if(L.algebra){const al=m_algebra(L);blocks.push({h:al.h,items:al.items,write:al.write});ans.push(al.a);}
  if(L.geom){const ge=m_geometry(L);blocks.push({h:ge.h,items:ge.items,write:ge.write});ans.push(ge.a);}
  if(L.logic){const lg=m_logic(L);blocks.push({h:lg.h,items:lg.items,write:lg.write});ans.push(lg.a);}
- let chalPool=CHAL[L.chal]||CHAL[3];if(L.comp&&CHAL.comp)chalPool=chalPool.concat(CHAL.comp);
+ let chalPool=CHAL[L.chal]||CHAL[3];
+ // rungs 5-7 all set chal:3 (same 3-item base pool) — without these, a child sees the identical
+ // ★ Challenge pool at three consecutive named tiers. Differentiate using flags already unique to
+ // each rung, reusing already-authored harder pools (no new curriculum content invented).
+ if(L.frac&&L.longmul&&CHAL[4])chalPool=chalPool.concat(CHAL[4]);
+ if(L.ratio&&CHAL.comp)chalPool=chalPool.concat(CHAL.comp);
+ if(L.comp&&CHAL.comp)chalPool=chalPool.concat(CHAL.comp);
  const ch=P(chalPool);blocks.push({h:'★ Challenge — think hard, take your time'+(L.comp?' (competition-style)':''),items:[ch[0]],write:4});ans.push('★: '+ch[1]);
  if(L.proof){blocks.push({h:'★★ Prove it',items:['Explain, in your own words and with an example, WHY the challenge answer above must be true.'],write:4});ans.push('★★: reward a clear reason + a worked example.');}
  return{title:'Maths Worksheet — Sarah (8)',sub:'Level '+(li+1)+'/'+LEVELS.sarah.maths.length+' · '+L.n,level:mLevelTag(li),blocks,ans};}
