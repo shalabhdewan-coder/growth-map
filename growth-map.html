@@ -253,7 +253,7 @@ const LEVELS={
    {n:'Two details',      wtier:'b', mini:2, write:'two'},
    {n:'Mini paragraph',   wtier:'c', mini:2, write:'para3'},
    {n:'Because & why',    wtier:'c', mini:3, write:'because'},
-   {n:'Read & answer',    wtier:'c', mini:2, write:'order3', qs:1},
+   {n:'Read & answer',    wtier:'c', mini:3, write:'order3', qs:1},
    {n:'Bridge to big-girl', wtier:'d', mini:2, write:'para3', qs:1}
   ]
  }
@@ -1218,12 +1218,14 @@ function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let bloc
  // C rhyme (rung-gated)
  if(L.rhyme){const rh=shuf(RHYME).slice(0,3),ra=[];blocks.push({h:'C. Which word rhymes? (circle it)',items:rh.map((r,i)=>(i+1)+')  '+r[0]+'  →  '+shuf(r[1]).join('  /  '))});rh.forEach(r=>ra.push(r[0]+'→'+r[1][0]));ans.push('C: '+ra.join(', '));}
  // D mini story comprehension (rung-gated); qs:1 adds one harder inference question on top.
- // On hand-authored rungs (L.boost unset) mini also picks WHICH HALF of the bank to draw from: mini:1
+ // On hand-authored rungs (L.boost unset) mini also picks WHICH SLICE of the bank to draw from: mini:1
  // (rungs 3-5) draws only from MINISTORY[0-5] — concrete recall stories whose own inference question
- // ('x') asks straightforward how-did-they-feel/why causal reasoning. mini:2 (rungs 6-10) draws only
+ // ('x') asks straightforward how-did-they-feel/why causal reasoning. mini:2 (rungs 6-7 and 10) draws
  // from MINISTORY[6-11] — the fable/moral stories (littering, the crow's feathers) and trait/metaphor
  // questions (what kind of sister is Maya, why did the leaf remind the fly of his name) that require
- // theme/character abstraction, a genuinely higher comprehension skill. Previously `mini` was read only
+ // theme/character abstraction, a genuinely higher comprehension skill. mini:3 (rungs 8-9) narrows
+ // further to MINISTORY[9-11] — just the fly/monkey/crow fable trio — the guaranteed-hardest,
+ // abstraction-only slice of the bank. Previously `mini` was read only
  // as a bare truthy check, so 1 vs 2 picked from the identical full 12-story pool with no real difficulty
  // step — the escalation implied by 0,0,1,1,1,1,2,2,2,2 was decorative. On synthetic "Independent Study"
  // rungs (L.boost set by intensifyRung), mini and qs used to just stay truthy forever — intensifyRung kept
@@ -1253,6 +1255,15 @@ function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let bloc
  // name?", "Why did the other crows laugh?") rather than plain fact lookup — a genuine, thematically-
  // fitting escalation for a "because" rung, reusing only the bank's existing stories. Rung 7 keeps
  // mini:2 (full 6-story pool) unchanged, so it stays distinct from rung 8's narrower fable-only slice.
+ // Rungs 8-9 ('Because & why'/'Read & answer') were mini:3 then mini:2 — difficulty went DOWN a rung:
+ // rung 9 reverted to the wider MINISTORY[6-11] 6-story pool, which includes 3 easier, concrete-recall
+ // stories (Ravi walking to school, Maya's brother falling down, Coco the duckling) alongside the same
+ // fable trio rung 8 guarantees every time — so a confirmed level-up from 8→9 could (and empirically
+ // often did) serve an objectively easier passage than the rung before it. Fixed by keeping rung 9 at
+ // mini:3 too, so it stays locked to the fly/monkey/crow fable trio like rung 8 — rung 9's own
+ // pre-existing qs:1 (rung 8 has none) is what now provides the real escalation: same guaranteed-hard
+ // pool, plus that story's own harder inference question on top. No new curriculum content: only reuses
+ // the bank's existing mini:3 slice one rung further, same pattern as the rung 7→8 fix above.
  if(L.mini){
   const boost=L.boost||0;
   const storyCount=boost?Math.max(1,Math.min(MINISTORY.length,L.mini-1)):1;
