@@ -508,7 +508,7 @@ function save(){
  try{
   const ext={};
   for(const g of ['sarah','mirayah']){ext[g]={};for(const k of Object.keys(LEVELS[g]))ext[g][k]=LEVELS[g][k].length-BASE_LADDER_LEN[g][k];}
-  const s={L:LEVEL,X:ext,B:{sarah:{i:BOOK.sarah.idx,d:BOOK.sarah.done},mirayah:{i:BOOK.mirayah.idx,d:BOOK.mirayah.done}}};
+  const s={L:LEVEL,X:ext,B:{sarah:{i:BOOK.sarah.idx,d:BOOK.sarah.done,c:BOOK.sarah.custom},mirayah:{i:BOOK.mirayah.idx,d:BOOK.mirayah.done,c:BOOK.mirayah.custom}}};
   history.replaceState(null,'','#'+encodeURIComponent(JSON.stringify(s)));
  }catch(e){/* if hash write is blocked, stay in-memory */}
 }
@@ -529,7 +529,8 @@ function load(){
   }}
   if(s.B){for(const g of ['sarah','mirayah']){
     if(s.B[g]){ if(Number.isInteger(s.B[g].i)) BOOK[g].idx=Math.max(0,s.B[g].i);
-                if(Array.isArray(s.B[g].d)) BOOK[g].done=s.B[g].d; }
+                if(Array.isArray(s.B[g].d)) BOOK[g].done=s.B[g].d;
+                if(typeof s.B[g].c==='string') BOOK[g].custom=s.B[g].c; }
   }}
  }catch(e){/* ignore a malformed hash */}
 }
@@ -1407,6 +1408,8 @@ document.addEventListener('click', e=>{
 document.addEventListener('input', e=>{
  const t=e.target.closest('[data-bookinput]'); if(!t) return;
  BOOK[t.dataset.bookinput].custom = t.value;
+ clearTimeout(document._bookSaveT);
+ document._bookSaveT=setTimeout(save,500); /* debounced so a typed-but-not-yet-confirmed title survives an accidental reload */
 });
 
 /* ===== TOP TABS ===== */
