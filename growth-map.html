@@ -1276,10 +1276,19 @@ function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let bloc
  // pre-existing qs:1 (rung 8 has none) is what now provides the real escalation: same guaranteed-hard
  // pool, plus that story's own harder inference question on top. No new curriculum content: only reuses
  // the bank's existing mini:3 slice one rung further, same pattern as the rung 7→8 fix above.
+ // Independent Study fix #2 (found in a later audit pass): the fix above reads L.mini/L.qs's
+ // MAGNITUDE instead of a bare truthy check, but those magnitudes are intensifyRung's own
+ // ceil(x*(1+0.15*tier)) values rounding UP — coarse enough that storyCount/qsCount (which then
+ // floor/min again) go flat for long stretches: qsCount stayed at 2 for six straight tiers (1-6)
+ // and storyCount stayed put within each 3-tier block, on live-generated output. Fix: derive
+ // storyCount/qsCount straight from the raw tier number (L.boost) instead of round-tripping
+ // through the already-rounded L.mini/L.qs, so every synthetic tier is guaranteed to add
+ // something over the one before it. Still bounded by MINISTORY.length (12) — no new curriculum
+ // content, only draws more of the bank's existing full stories as tiers climb.
  if(L.mini){
   const boost=L.boost||0;
-  const storyCount=boost?Math.max(1,Math.min(MINISTORY.length,L.mini-1)):1;
-  const qsCount=boost?Math.min(storyCount,L.qs||0):(L.qs?1:0);
+  const storyCount=boost?Math.min(MINISTORY.length,1+boost):1;
+  const qsCount=boost?Math.min(storyCount,1+Math.floor(boost/2)):(L.qs?1:0);
   const pool=boost?MINISTORY:(L.mini>=3?MINISTORY.slice(9):(L.mini>=2?MINISTORY.slice(6):MINISTORY.slice(0,6)));
   const stories=boost?shuf(MINISTORY).slice(0,storyCount):[P(pool)];
   let dq=[],da=[];
