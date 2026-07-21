@@ -346,8 +346,12 @@ const GIVE=[
  {n:'Mentor a new helper',  action:'Teach someone new how to help',                                 reflect:'What did they learn from me?', impact:'1 person mentored'},
  {n:'Lead & present a project',action:'Run a whole project and present its results',                 reflect:'What difference did we make?', impact:'A project led & presented'}
 ];
-Object.assign(LEVELS.sarah,   {swimming:SWIM, music:MUSIC, riding:RIDE, madhurim:GIVE});
-Object.assign(LEVELS.mirayah, {swimming:SWIM, music:MUSIC, riding:RIDE, madhurim:GIVE});
+/* Each girl gets her OWN deep copy of the lane arrays (not a shared reference).
+   doDoneLevelUp's lad.push(...) mutates a girl's own ladder in place when she goes
+   past the hand-authored ceiling; if the arrays were shared, one girl's synthetic
+   rungs would silently leak into the other girl's rail/overview (see fix log). */
+Object.assign(LEVELS.sarah,   {swimming:SWIM.map(r=>({...r})), music:MUSIC.map(r=>({...r})), riding:RIDE.map(r=>({...r})), madhurim:GIVE.map(r=>({...r}))});
+Object.assign(LEVELS.mirayah, {swimming:SWIM.map(r=>({...r})), music:MUSIC.map(r=>({...r})), riding:RIDE.map(r=>({...r})), madhurim:GIVE.map(r=>({...r}))});
 
 /* ---- SCIENCE ladders (topic banks; answers travel with questions) ---- */
 const SCI_SARAH=[
@@ -1165,7 +1169,7 @@ function ws_science_mirayah(li){const L=SCI_MIRAYAH[li];let blocks=[],ans=[];
 
 /* ---------- LANE PRACTICE CARDS (Swimming · Music · Riding · Madhurim) ---------- */
 function who(gk){const g=DATA[gk];return g.name+' ('+g.age+')';}
-function ws_swim(gk,li){const L=SWIM[li];
+function ws_swim(gk,li){const lad=LEVELS[gk].swimming,L=lad[li];
  /* SWIM's rung fields (wu/main/tech/goal) are all plain strings, so intensifyRung's
     generic "scale every numeric field" pass has nothing to grab once a girl runs past
     the last hand-authored rung (see growth-map-exhaustive-audit finding). `boost` (the
@@ -1173,7 +1177,7 @@ function ws_swim(gk,li){const L=SWIM[li];
     on hand-authored rungs 1-12) drives a real, escalating extra round here instead, so
     each successive synthetic rung actually asks for more than the one before it. */
  const boostNote=L.boost?' + '+L.boost+' extra round'+(L.boost>1?'s':'')+' of the main set — Independent Study tier '+L.boost:'';
- return{title:'🏊 Swimming — '+who(gk),sub:'Level '+(li+1)+'/'+SWIM.length+' · '+L.n,level:'Aquatics — the spike',keyLabel:'Coach / parent notes',note:'Always swim with a coach or adult present. Technique before speed.',
+ return{title:'🏊 Swimming — '+who(gk),sub:'Level '+(li+1)+'/'+lad.length+' · '+L.n,level:'Aquatics — the spike',keyLabel:'Coach / parent notes',note:'Always swim with a coach or adult present. Technique before speed.',
  blocks:[
   {h:'Warm-up',items:[L.wu]},
   {h:'Main set',items:[L.main+boostNote]},
@@ -1181,7 +1185,7 @@ function ws_swim(gk,li){const L=SWIM[li];
   {h:'This session’s goal',items:['🎯 '+L.goal],write:1},
   {h:'Log — times / distances today',items:[],write:3}
  ],ans:['✅ Level up when: '+L.goal+(L.boost?' (plus the tier-'+L.boost+' extra round'+(L.boost>1?'s':'')+' completed)':'')]};}
-function ws_music(gk,li){const L=MUSIC[li];return{title:'🎵 Music — '+who(gk),sub:'Level '+(li+1)+'/'+MUSIC.length+' · '+L.n,level:'Graded music pathway',keyLabel:'Teacher / parent notes',note:'Little and often beats one long session. Enjoy the music.',
+function ws_music(gk,li){const lad=LEVELS[gk].music,L=lad[li];return{title:'🎵 Music — '+who(gk),sub:'Level '+(li+1)+'/'+lad.length+' · '+L.n,level:'Graded music pathway',keyLabel:'Teacher / parent notes',note:'Little and often beats one long session. Enjoy the music.',
  blocks:[
   {h:'Technique & scales',items:[L.tech]},
   {h:'Piece practice',items:[L.piece],write:1},
@@ -1189,12 +1193,12 @@ function ws_music(gk,li){const L=MUSIC[li];return{title:'🎵 Music — '+who(gk
   {h:'Aural / listening',items:[L.aural]},
   {h:'Practice time',items:['Aim for about '+L.mins+' minutes today.'],write:1}
  ],ans:['✅ Level up when: this rung’s piece is performance-ready and the scales are secure.']};}
-function ws_riding(gk,li){const L=RIDE[li];
+function ws_riding(gk,li){const lad=LEVELS[gk].riding,L=lad[li];
  /* Same dead-flag class as ws_swim: RIDE's fields (ground/flat/ex/safe) are all plain
     strings, so intensifyRung's generic numeric scaling has nothing to grab past the last
     hand-authored rung. `boost` drives a real, escalating repeat count here instead. */
  const boostNote=L.boost?' — repeat '+L.boost+' extra time'+(L.boost>1?'s':'')+' for polish (Independent Study tier '+L.boost+')':'';
- return{title:'🐴 Riding — '+who(gk),sub:'Level '+(li+1)+'/'+RIDE.length+' · '+L.n,level:'Horsemanship pathway',keyLabel:'Instructor / parent notes',note:'Always ride with an instructor, helmet and boots. Confidence before challenge.',
+ return{title:'🐴 Riding — '+who(gk),sub:'Level '+(li+1)+'/'+lad.length+' · '+L.n,level:'Horsemanship pathway',keyLabel:'Instructor / parent notes',note:'Always ride with an instructor, helmet and boots. Confidence before challenge.',
  blocks:[
   {h:'On the ground',items:[L.ground==='—'?'Quick check & warm-up walk':L.ground]},
   {h:'Flatwork focus',items:[L.flat]},
@@ -1202,13 +1206,13 @@ function ws_riding(gk,li){const L=RIDE[li];
   {h:'Safety reminder',items:['⚠️ '+L.safe]},
   {h:'Log — how it went',items:[],write:2}
  ],ans:['✅ Level up when: '+L.ex.toLowerCase()+' feels balanced and safe.'+(L.boost?' Plus the tier-'+L.boost+' extra repeats.':'')]};}
-function ws_madhurim(gk,li){const L=GIVE[li];
+function ws_madhurim(gk,li){const lad=LEVELS[gk].madhurim,L=lad[li];
  /* Same dead-flag class as ws_swim/ws_riding: GIVE's fields (action/reflect/impact) are all
     plain strings, so intensifyRung's generic numeric scaling has nothing to grab past the
     last hand-authored rung. `boost` drives a real, escalating scope multiplier here instead. */
  const scale=L.boost?1+L.boost:1;
  const boostNote=L.boost?' — Independent Study tier '+L.boost+': scale this up to '+scale+'× the usual scope (more people helped / more sessions / more collected)':'';
- return{title:'🤝 Madhurim — '+who(gk),sub:'Level '+(li+1)+'/'+GIVE.length+' · '+L.n,level:'Service & leadership — the differentiator',keyLabel:'Parent / mentor notes',note:'Kindness first. Small, real actions add up to something big.',
+ return{title:'🤝 Madhurim — '+who(gk),sub:'Level '+(li+1)+'/'+lad.length+' · '+L.n,level:'Service & leadership — the differentiator',keyLabel:'Parent / mentor notes',note:'Kindness first. Small, real actions add up to something big.',
  blocks:[
   {h:'This week’s action',items:[L.action+boostNote],write:1},
   {h:'Reflect',items:['💭 '+L.reflect],write:2},
