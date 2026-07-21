@@ -716,12 +716,15 @@ function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans
  {const step=P(L.count||[2]),st=R(1,3)*step;blocks.push({h:'D. Count in '+step+'s',items:[st+', '+(st+step)+', ____, ____, ____']});ans.push('D: '+(st+step*2)+', '+(st+step*3)+', '+(st+step*4));}
  // E multiply-as-groups (higher rungs) — mul:1 must read L.count (matching block D), not a hardcoded
  // array, and must respect L.mulMax (MOE p.34 "3.3 multiplying within 40" for rung 8; rungs 9-10 extend
- // that ceiling as bridge territory, see content/maths-mirayah-rung8/9/10.md). g is picked first (kept
- // small/drawable per the item text's own "draw the groups" instruction), then L.count is filtered down
- // to values that keep g*per within mulMax before per is chosen — guarantees the product never exceeds
- // the rung's sourced cap and opts is always non-empty (arr[0] always qualifies for every (g,mulMax) this
- // ladder produces).
- if(L.mul){const arr=L.count||[2,5,10],mCap=L.mulMax||40,g=R(2,8),permax=Math.max(arr[0],Math.floor(mCap/g)),opts=arr.filter(v=>v<=permax),per=P(opts.length?opts:[arr[0]]);
+ // that ceiling as bridge territory, see content/maths-mirayah-rung8/9/10.md). Was: g picked first from
+ // a fixed R(2,8) range, then per filtered down to whatever kept g*per<=mulMax — since rung10's count
+ // ([3,4,6]) tops out at 6 (chosen for block D's skip-counting, not this block), g capped at 8 meant the
+ // achievable ceiling was stuck at 8×6=48 no matter how high mulMax was raised — rung10 (mulMax:90) never
+ // beat rung9 (mulMax:60, achievable ceiling 60). Fixed: per is drawn from L.count first (unchanged,
+ // matches block D), then g's own range is derived from mulMax/per (same pattern as block H's twostep:2
+ // fix), capped at 20 for plausibility ("draw the groups") — so raising mulMax now actually raises the
+ // achievable ceiling, while g is still floored so g*per can never exceed mulMax.
+ if(L.mul){const arr=L.count||[2,5,10],mCap=L.mulMax||40,per=P(arr),gmax=Math.max(2,Math.min(20,Math.floor(mCap/per))),gmin=Math.max(2,Math.floor(gmax*0.6)),g=R(gmin,gmax);
   blocks.push({h:'E. Groups',items:[g+' baskets have '+per+' apples each. How many apples in all?  ____   (draw the groups)']});ans.push('E: '+(g*per));}
  // shapes
  if(L.shapes){const sh=P([['3 sides','triangle'],['4 equal sides','square'],['round, no corners','circle'],['4 sides, 2 long & 2 short','rectangle']]);blocks.push({h:'F. Shape detective',items:['Draw a shape with '+sh[0]+'. What is it called? ____________']});ans.push('F: '+sh[1]);}
@@ -1073,19 +1076,28 @@ function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let bloc
  // C rhyme (rung-gated)
  if(L.rhyme){const rh=shuf(RHYME).slice(0,3),ra=[];blocks.push({h:'C. Which word rhymes? (circle it)',items:rh.map((r,i)=>(i+1)+')  '+r[0]+'  →  '+shuf(r[1]).join('  /  '))});rh.forEach(r=>ra.push(r[0]+'→'+r[1][0]));ans.push('C: '+ra.join(', '));}
  // D mini story comprehension (rung-gated); qs:1 (rungs 9-10) adds one harder inference question on top.
- // On hand-authored rungs (L.boost unset) this is exactly the old behaviour: one passage, plus the extra
- // question when qs is set. On synthetic "Independent Study" rungs (L.boost set by intensifyRung), mini
- // and qs used to just stay truthy forever — intensifyRung kept scaling their numeric values (2→3→4...,
- // 1→2→3...) but ws_english_mirayah only ever read them as booleans, so nothing past rung 10 actually got
- // harder (see content/english-mirayah-boost.md history). Fix: once boosted, read the magnitude instead —
- // more MINISTORY passages as `mini` grows, and more of those passages carry their own harder inference
- // question as `qs` grows. Reuses the bank's existing 12 full stories (each already has its own x/xa
- // question) — no new curriculum content invented. Bounded by MINISTORY.length so it can't overrun the bank.
+ // On hand-authored rungs (L.boost unset) mini also picks WHICH HALF of the bank to draw from: mini:1
+ // (rungs 3-6) draws only from MINISTORY[0-5] — concrete recall stories whose own inference question
+ // ('x') asks straightforward how-did-they-feel/why causal reasoning. mini:2 (rungs 7-10) draws only
+ // from MINISTORY[6-11] — the fable/moral stories (littering, the crow's feathers) and trait/metaphor
+ // questions (what kind of sister is Maya, why did the leaf remind the fly of his name) that require
+ // theme/character abstraction, a genuinely higher comprehension skill. Previously `mini` was read only
+ // as a bare truthy check, so 1 vs 2 picked from the identical full 12-story pool with no real difficulty
+ // step — the escalation implied by 0,0,1,1,1,1,2,2,2,2 was decorative. On synthetic "Independent Study"
+ // rungs (L.boost set by intensifyRung), mini and qs used to just stay truthy forever — intensifyRung kept
+ // scaling their numeric values (2→3→4..., 1→2→3...) but ws_english_mirayah only ever read them as
+ // booleans, so nothing past rung 10 actually got harder (see content/english-mirayah-boost.md history).
+ // Fix: once boosted, read the magnitude instead — more MINISTORY passages (drawn from the full bank) as
+ // `mini` grows, and more of those passages carry their own harder inference question as `qs` grows.
+ // No new curriculum content invented anywhere here — only reuses/repartitions the bank's existing 12
+ // full stories (each already has its own x/xa question). Bounded by MINISTORY.length so it can't overrun
+ // the bank.
  if(L.mini){
   const boost=L.boost||0;
   const storyCount=boost?Math.max(1,Math.min(MINISTORY.length,L.mini-1)):1;
   const qsCount=boost?Math.min(storyCount,L.qs||0):(L.qs?1:0);
-  const stories=boost?shuf(MINISTORY).slice(0,storyCount):[P(MINISTORY)];
+  const pool=boost?MINISTORY:(L.mini>=2?MINISTORY.slice(6):MINISTORY.slice(0,6));
+  const stories=boost?shuf(MINISTORY).slice(0,storyCount):[P(pool)];
   let dq=[],da=[];
   stories.forEach((ms,i)=>{dq=dq.concat(ms.q);da=da.concat(ms.a);if(i<qsCount){dq.push(ms.x);da.push(ms.xa);}});
   blocks.push({h:'D. Read &amp; answer',passage:stories.map(s=>s.t).join('<br><br>'),items:dq,write:1});
