@@ -241,8 +241,8 @@ const LEVELS={
    {n:'Story sums',         addMax:90, subMax:90, bonds:50, count:[2,5,10],  story:2, shapes:1, place:1},
    {n:'Regrouping',         addMax:99, subMax:99, bonds:100, count:[10],      story:2, shapes:1, place:1, regroup:1},
    {n:'Groups of 2·5·10',   addMax:99, subMax:99, bonds:100, count:[2,5,10],  story:2, shapes:0, mul:1, mulMax:40, regroup:1},
-   {n:'Two-step (little)',  addMax:99, subMax:99, bonds:100, count:[2,5,10],  story:2, shapes:0, mul:1, mulMax:60, twostep:1, regroup:1},
-   {n:'Bridge to big-girl', addMax:99, subMax:99, bonds:100, count:[3,4,6],   story:2, shapes:0, mul:1, mulMax:90, twostep:2, regroup:1}
+   {n:'Two-step (little)',  addMax:99, subMax:99, bonds:100, count:[2,5,10],  story:2, shapes:0, mul:1, mulMax:60, twostep:1, regroup:2},
+   {n:'Bridge to big-girl', addMax:99, subMax:99, bonds:100, count:[3,4,6],   story:2, shapes:0, mul:1, mulMax:90, twostep:2, regroup:2}
   ],
   english:[
    {n:'Sight words',      wtier:'a', mini:0, write:'word'},
@@ -729,13 +729,32 @@ function mLevelTag(li){const map=['Singapore P3 · fluency + 2-step','Singapore 
 function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans=[];
  // A number bonds
  {let nb=[],a=[];for(let i=0;i<6;i++){const x=R(1,(L.bonds||10)-1);nb.push((i+1)+')  '+x+' + ____ = '+(L.bonds||10));a.push((L.bonds||10)-x);}blocks.push({h:'A. Number bonds to '+(L.bonds||10),two:true,items:nb});ans.push('A: '+a.join(', '));}
- // B add — regroup:1 (rung7) must force real carrying (NCERT ch.6 "36+47=83": ones 6+7=13 carries a ten),
+ // B add — regroup:1 (rungs 6-7) forces real carrying (NCERT ch.6 "36+47=83": ones 6+7=13 carries a ten),
  // not merely allow it: ones digits are picked so xo+yo>=10 every time, tens picked so the sum stays <=cap.
- {let ad=[],a=[];for(let i=0;i<6;i++){const cap=L.addMax||10;let x,y;if(L.regroup){const xo=R(1,9),yo=R(10-xo,9),tmax=Math.max(1,Math.floor((cap-xo-yo)/20)),xt=R(1,tmax),yt=R(1,tmax);x=xt*10+xo;y=yt*10+yo;}else{x=R(2,Math.floor(cap*0.6));y=R(2,Math.max(2,cap-x));}ad.push((i+1)+')  '+x+' + '+y+' = ____');a.push(x+y);}blocks.push({h:'B. Add it up',two:true,items:ad});ans.push('B: '+a.join(', '));}
- // C subtract (if any) — regroup:1 must force real borrowing (NCERT ch.6 "46−18=28": "opens 1 garland"
- // because ones 6<8), same fix pattern as block B: ones digits picked so xo<yo every time (borrow forced),
- // tens digits picked so x>y always holds.
- if(L.subMax){let sb=[],a=[];for(let i=0;i<6;i++){const cap=L.subMax;let x,y;if(L.regroup){const xo=R(0,8),yo=R(xo+1,9),tmax=Math.max(2,Math.floor(cap/10)),xt=R(2,tmax),yt=R(1,xt-1);x=xt*10+xo;y=yt*10+yo;}else{x=R(Math.floor(cap*0.4),cap);y=R(1,x-1);}sb.push((i+1)+')  '+x+' − '+y+' = ____');a.push(x-y);}blocks.push({h:'C. Take away',two:true,items:sb});ans.push('C: '+a.join(', '));}
+ // regroup:2 (rungs 8-9 "Two-step (little)"/"Bridge to big-girl") was previously identical to regroup:1 —
+ // addMax/subMax/bonds cap out at 99/99/100 for all four rungs so single-carry alone can't escalate any
+ // further (confirmed: 200-sample stats showed near-identical A/B/C ranges across rungs 6-9). Fixed: for
+ // regroup:2 the tens digits are now ALSO forced to sum >=9 (so tens+carry-in >=10), pushing the answer
+ // into 3 digits — e.g. 68+57=125 — a genuine "bridge to big-girl" escalation (applying the same
+ // regrouping rule Mirayah already knows one more time), not new content.
+ {let ad=[],a=[];for(let i=0;i<6;i++){const cap=L.addMax||10;let x,y;
+  if(L.regroup>=2){const xo=R(1,9),yo=R(10-xo,9),xt=R(4,9),yt=R(Math.max(1,9-xt),9);x=xt*10+xo;y=yt*10+yo;}
+  else if(L.regroup){const xo=R(1,9),yo=R(10-xo,9),tmax=Math.max(1,Math.floor((cap-xo-yo)/20)),xt=R(1,tmax),yt=R(1,tmax);x=xt*10+xo;y=yt*10+yo;}
+  else{x=R(2,Math.floor(cap*0.6));y=R(2,Math.max(2,cap-x));}
+  ad.push((i+1)+')  '+x+' + '+y+' = ____');a.push(x+y);}blocks.push({h:'B. Add it up',two:true,items:ad});ans.push('B: '+a.join(', '));}
+ // C subtract (if any) — regroup:1 (rungs 6-7) forces real borrowing (NCERT ch.6 "46−18=28": "opens 1
+ // garland" because ones 6<8), same fix pattern as block B: ones digits picked so xo<yo every time (borrow
+ // forced), tens digits picked so x>y always holds. regroup:2 (rungs 8-9) was likewise identical to
+ // regroup:1 (same plateau as block B). Fixed: minuend becomes a 3-digit "just over 100" bridge number
+ // with its tens digit forced to 0 (e.g. 104), so subtracting a 2-digit number forces a genuine "borrow
+ // across a zero" — a well-known harder step than plain 2-digit borrowing (104−47: ones can't borrow from
+ // an empty tens, so it borrows from the hundreds first) — mirrors block B's 3-digit escalation rather
+ // than inventing unrelated content.
+ if(L.subMax){let sb=[],a=[];for(let i=0;i<6;i++){const cap=L.subMax;let x,y;
+  if(L.regroup>=2){const xo=R(0,8),yo=R(xo+1,9),yt=R(1,9);x=100+xo;y=yt*10+yo;}
+  else if(L.regroup){const xo=R(0,8),yo=R(xo+1,9),tmax=Math.max(2,Math.floor(cap/10)),xt=R(2,tmax),yt=R(1,xt-1);x=xt*10+xo;y=yt*10+yo;}
+  else{x=R(Math.floor(cap*0.4),cap);y=R(1,x-1);}
+  sb.push((i+1)+')  '+x+' − '+y+' = ____');a.push(x-y);}blocks.push({h:'C. Take away',two:true,items:sb});ans.push('C: '+a.join(', '));}
  // D count in steps
  {const step=P(L.count||[2]),st=R(1,3)*step;blocks.push({h:'D. Count in '+step+'s',items:[st+', '+(st+step)+', ____, ____, ____']});ans.push('D: '+(st+step*2)+', '+(st+step*3)+', '+(st+step*4));}
  // E multiply-as-groups (higher rungs) — mul:1 must read L.count (matching block D), not a hardcoded
