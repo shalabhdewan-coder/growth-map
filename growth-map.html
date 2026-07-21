@@ -810,7 +810,7 @@ const GRAMMAR={
  // hard tier (rung4 "Opinion & why" onward): base 8 + 4 new, same calibration note as easy tier above.
  hard:[['the childrens toys was broken','The children’s toys were broken.'],['neither of the boys were ready','Neither of the boys was ready.'],['its been raining since morning, the streets are wet','It’s been raining since morning; the streets are wet.'],['he asked me were i going','He asked me where I was going.'],['the team are playing good today','The team is playing well today.'],['whom shall i say is calling','Who shall I say is calling?'],['if i was you i would apologise','If I were you, I would apologise.'],['the reason is because she was late','The reason is that she was late.'],
   ['she is one of the student who always help','She is one of the students who always helps.'],['between you and i, this is a secret','Between you and me, this is a secret.'],['he dont hardly ever complain','He hardly ever complains.'],['the news are very encouraging today','The news is very encouraging today.'],
-  // hard tier — 12→20: rungs 4-11 (8 of the 12 English rungs) all draw from GRAMMAR.hard, making it
+  // hard tier — 12→20: rungs 4-12 (9 of the 12 English rungs) all draw from GRAMMAR.hard, making it
   // the single most-hit bank on the ladder; extended further than easy/mid on purpose. Hand-authored,
   // same provenance discipline as above (NCERT readers carry no drill material), calibrated to P5/P6 scope.
   ['he should of finished his homework by now','He should have finished his homework by now.'],['running quickly, the bus was caught by her','Running quickly, she caught the bus.'],['each of the players have their own kit','Each of the players has their own kit.'],['she said that she is going tomorrow','She said that she was going the next day.'],['the book is laying on the table since morning','The book has been lying on the table since morning.'],['he is more taller than his brother','He is taller than his brother.'],['its a shame that the team lost there final match','It’s a shame that the team lost their final match.'],['neither the coach nor the players was informed','Neither the coach nor the players were informed.']]
@@ -944,7 +944,7 @@ const RHETORIC=[
 // `boost` (set only by intensifyRung, on synthetic rungs past BASE_LADDER_LEN — never on hand-authored
 // rungs 1-12, where boost is undefined) shifts which VOCAB/GRAMMAR tier the rung actually draws from,
 // so English keeps escalating past its hand-authored ceiling instead of repeating 'harder'/'hard' forever.
-// GT_ORDER has no tier past 'hard' on purpose — GRAMMAR.hard already serves 8 of 12 rungs (deep enough
+// GT_ORDER has no tier past 'hard' on purpose — GRAMMAR.hard already serves 9 of 12 rungs (deep enough
 // per the plan's own note); `gc` (numeric, already scaled generically by intensifyRung) carries the load
 // of escalating grammar difficulty instead of adding a new tier that would need its own content bank.
 const VT_ORDER=['easy','mid','hard','harder','expert'];
