@@ -1178,11 +1178,13 @@ function mwPick(key,book){const v=MWRITE[key]||MWRITE.word;const pick=Array.isAr
 const WT_ORDER=['a','b','c','d'];
 function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let blocks=[],ans=[];
  const effWtier=effTier(WT_ORDER,L.wtier,L.boost);
- // A about my book
+ // A about my book — no printed answer key exists (child's own book, open-ended), so it must not
+ // count toward MTOTAL/mastery — same fix pattern as ws_english_sarah's Block B (commit 4bd9ee8)
+ // and ws_science_mirayah's Block A (commit 413d819).
  blocks.push({h:'A. About my book — “'+book+'”',items:[
    '1) Who is in the story?  ____________________',
    '2) One new word I learned:  ____________',
-   '3) Draw your favourite part, then write about it.'],write:1});
+   '3) Draw your favourite part, then write about it.'],write:1,ungraded:true});
  // B sight words
  const sf=shuf(SIGHT[effWtier]).slice(0,4),sa=[];
  blocks.push({h:'B. Fill the gap (circle the right word)',items:sf.map((s,i)=>(i+1)+')  '+s[0]+'   ('+shuf(s[1]).join('  /  ')+')')});
@@ -1236,8 +1238,9 @@ function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let bloc
   blocks.push({h:'D. Read &amp; answer',passage:stories.map(s=>s.t).join('<br><br>'),items:dq,write:1});
   ans.push('D: '+da.join(' | '));
  }
- // E write
- blocks.push({h:'E. My turn to write',items:[mwPick(L.write,book)],write:2});
+ // E write — free-response writing prompt with no printed answer key; must not count toward
+ // MTOTAL/mastery — same fix pattern as ws_english_sarah's Writing challenge block (commit 4bd9ee8).
+ blocks.push({h:'E. My turn to write',items:[mwPick(L.write,book)],write:2,ungraded:true});
  return{title:'English Worksheet — Mirayah (6)',sub:'Level '+(li+1)+'/'+LEVELS.mirayah.english.length+' · '+L.n+'   ·   📖 '+book,level:'Age 6 · reading fluency + first sentences (joy first)',blocks,ans};}
 
 /* ---------- SCIENCE worksheet generators ---------- */
