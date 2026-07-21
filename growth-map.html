@@ -249,8 +249,8 @@ const LEVELS={
    {n:'Rhyming words',    wtier:'a', mini:0, write:'word',  rhyme:1},
    {n:'First sentences',  wtier:'a', mini:1, write:'sent'},
    {n:'Short comprehension', wtier:'b', mini:1, write:'sent'},
-   {n:'Retell it',        wtier:'b', mini:1, write:'retell'},
-   {n:'Two details',      wtier:'b', mini:1, write:'two'},
+   {n:'Retell it',        wtier:'b', mini:1, write:'retell', qs:1},
+   {n:'Two details',      wtier:'b', mini:2, write:'two'},
    {n:'Mini paragraph',   wtier:'c', mini:2, write:'para3'},
    {n:'Because & why',    wtier:'c', mini:2, write:'because'},
    {n:'Read & answer',    wtier:'c', mini:2, write:'order3', qs:1},
@@ -1145,10 +1145,10 @@ function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let bloc
  sf.forEach(s=>sa.push(s[1][0]));ans.push('B: '+sa.join(', '));
  // C rhyme (rung-gated)
  if(L.rhyme){const rh=shuf(RHYME).slice(0,3),ra=[];blocks.push({h:'C. Which word rhymes? (circle it)',items:rh.map((r,i)=>(i+1)+')  '+r[0]+'  →  '+shuf(r[1]).join('  /  '))});rh.forEach(r=>ra.push(r[0]+'→'+r[1][0]));ans.push('C: '+ra.join(', '));}
- // D mini story comprehension (rung-gated); qs:1 (rungs 9-10) adds one harder inference question on top.
+ // D mini story comprehension (rung-gated); qs:1 adds one harder inference question on top.
  // On hand-authored rungs (L.boost unset) mini also picks WHICH HALF of the bank to draw from: mini:1
- // (rungs 3-6) draws only from MINISTORY[0-5] — concrete recall stories whose own inference question
- // ('x') asks straightforward how-did-they-feel/why causal reasoning. mini:2 (rungs 7-10) draws only
+ // (rungs 3-5) draws only from MINISTORY[0-5] — concrete recall stories whose own inference question
+ // ('x') asks straightforward how-did-they-feel/why causal reasoning. mini:2 (rungs 6-10) draws only
  // from MINISTORY[6-11] — the fable/moral stories (littering, the crow's feathers) and trait/metaphor
  // questions (what kind of sister is Maya, why did the leaf remind the fly of his name) that require
  // theme/character abstraction, a genuinely higher comprehension skill. Previously `mini` was read only
@@ -1162,6 +1162,16 @@ function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let bloc
  // No new curriculum content invented anywhere here — only reuses/repartitions the bank's existing 12
  // full stories (each already has its own x/xa question). Bounded by MINISTORY.length so it can't overrun
  // the bank.
+ // Rungs 4-6 ('Short comprehension'/'Retell it'/'Two details') were ALSO all mini:1 — identical
+ // wtier:'b', identical MINISTORY[0-5] pool, one random story each — so the only thing that changed
+ // rung to rung was the ungraded Block E writing prompt text. Fixed by giving the graded blocks a
+ // real step: rung 5 'Retell it' now sets qs:1, so on top of the same concrete-recall pool it also
+ // asks that story's own harder inference question ('x'/'xa') — a genuine escalation over rung 4,
+ // and a natural fit for "retelling" needing more than literal recall. Rung 6 'Two details' now sets
+ // mini:2, moving it into the fable/moral-abstraction pool (MINISTORY[6-11]) a rung early — the same
+ // real difficulty jump mini:2 already gives rung 7, just reached one rung sooner. No new curriculum
+ // content: both fixes only flip existing knobs (qs, mini) that ws_english_mirayah already reads
+ // correctly for every other rung.
  if(L.mini){
   const boost=L.boost||0;
   const storyCount=boost?Math.max(1,Math.min(MINISTORY.length,L.mini-1)):1;
