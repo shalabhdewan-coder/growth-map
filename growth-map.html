@@ -789,7 +789,7 @@ function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans
  // fluency growth on top of the new skill, matching the established rung1→2 reps precedent above.
  {let nb=[],a=[];const bTarget=L.bonds||10,reps=L.bondsReps||6;
   for(let i=0;i<reps;i++){let line,av;
-   if(L.bondsForm===2){
+   if(L.bondsForm>=2){
     const s=R(11,Math.max(12,bTarget-19)),maxTensJump=Math.max(1,Math.floor((bTarget-s-9)/10)),
       tensJump=R(1,maxTensJump)*10,onesJump=R(1,Math.min(9,bTarget-s-tensJump)),target=s+tensJump+onesJump;
     line=(i+1)+')  '+s+' + ___ + ___ = '+target;av=tensJump+' & '+onesJump;
