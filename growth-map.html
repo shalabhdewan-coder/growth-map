@@ -495,10 +495,20 @@ const LEVEL={
 };
 const BOOK ={sarah:{idx:0,custom:null,done:[]}, mirayah:{idx:0,custom:null,done:[]}};
 
-/* ===== persistence via URL hash (survives reload, no localStorage) ===== */
+/* ===== persistence via URL hash (survives reload, no localStorage) =====
+   X = how many synthetic "Independent Study" rungs doDoneLevelUp has pushed
+   onto each ladder, past BASE_LADDER_LEN. Without this, only the numeric
+   LEVEL index was saved — on reload LEVELS[g][k] gets rebuilt fresh from the
+   hand-authored source (short again), so load()'s own clamp silently snapped
+   any level past the hand-authored ceiling back down, discarding all
+   ladder-extension progress every time the page reloaded. Saving the push
+   count lets load() replay intensifyRung the same number of times BEFORE
+   computing the clamp, so the ladder is the right length again first. */
 function save(){
  try{
-  const s={L:LEVEL,B:{sarah:{i:BOOK.sarah.idx,d:BOOK.sarah.done},mirayah:{i:BOOK.mirayah.idx,d:BOOK.mirayah.done}}};
+  const ext={};
+  for(const g of ['sarah','mirayah']){ext[g]={};for(const k of Object.keys(LEVELS[g]))ext[g][k]=LEVELS[g][k].length-BASE_LADDER_LEN[g][k];}
+  const s={L:LEVEL,X:ext,B:{sarah:{i:BOOK.sarah.idx,d:BOOK.sarah.done},mirayah:{i:BOOK.mirayah.idx,d:BOOK.mirayah.done}}};
   history.replaceState(null,'','#'+encodeURIComponent(JSON.stringify(s)));
  }catch(e){/* if hash write is blocked, stay in-memory */}
 }
@@ -506,6 +516,13 @@ function load(){
  try{
   if(!location.hash||location.hash.length<2)return;
   const s=JSON.parse(decodeURIComponent(location.hash.slice(1)));
+  if(s.X){for(const g of ['sarah','mirayah'])for(const k of Object.keys(LEVELS[g])){
+    const n=s.X[g] && s.X[g][k];
+    if(Number.isInteger(n)&&n>0){
+     const lad=LEVELS[g][k],base=BASE_LADDER_LEN[g][k],cap=Math.min(n,1000); /* cap guards against a hand-edited/corrupt hash forcing a huge synchronous loop */
+     for(let t=1;t<=cap;t++)lad.push(intensifyRung(lad[base-1],t));
+    }
+  }}
   if(s.L){for(const g of ['sarah','mirayah'])for(const k of Object.keys(LEVELS[g])){
     const v=s.L[g] && s.L[g][k]; const max=LEVELS[g][k].length-1;
     if(Number.isInteger(v)) LEVEL[g][k]=Math.max(0,Math.min(max,v));
@@ -1118,6 +1135,7 @@ function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let bloc
 
 /* ---------- SCIENCE worksheet generators ---------- */
 function sciLevelTag(li){const map=['P3 · living things basics','P3 · plants','P3–P4 · classifying animals','P4 · life cycles & habitats','P4 · materials','P4–P5 · states of matter','P5 · forces & magnets','P5 · light, sound & heat','P5–P6 · body systems','P6 · cells & microbes','Lower-secondary · matter & chemistry','The science spike — method & experimental design'];return map[li]||'Sarah science';}
+function mirayahSciLevelTag(li){const map=['Reception/P1 · living vs non-living','Reception/P1 · the five senses','P1 · parts of a plant','P1 · animal habitats','P1–P2 · animal life cycles','P1–P2 · hot & cold, melting','P2 · push & pull forces','P2 · float & sink, materials','P2 · day & night, the Sun & Moon','P2–P3 · scientific method basics'];return map[li]||'Mirayah science';}
 function ws_science_sarah(li){const L=SCI_SARAH[li];let blocks=[],ans=[];
  // `boost` is only ever set by intensifyRung on synthetic "Independent Study" rungs past
  // BASE_LADDER_LEN (undefined on hand-authored rungs 1-12). Science rungs carry no numeric knob
@@ -1165,7 +1183,7 @@ function ws_science_mirayah(li){const L=SCI_MIRAYAH[li];let blocks=[],ans=[];
  blocks.push({h:'D. Little scientist — guess, then test 🔎',items:me.map(m=>m[0]),write:1});
  ans.push('D: '+me.map(m=>m[1]).join(' | '));
  blocks.push({h:'E. Try it (with a grown-up)',items:[L.lab],write:1});
- return{title:'Science Worksheet — Mirayah (6)',sub:'Level '+(li+1)+'/'+SCI_MIRAYAH.length+' · '+L.n,level:'Age 6 · science through observing & wondering (joy first)',blocks,ans};}
+ return{title:'Science Worksheet — Mirayah (6)',sub:'Level '+(li+1)+'/'+SCI_MIRAYAH.length+' · '+L.n,level:mirayahSciLevelTag(li),blocks,ans};}
 
 /* ---------- LANE PRACTICE CARDS (Swimming · Music · Riding · Madhurim) ---------- */
 function who(gk){const g=DATA[gk];return g.name+' ('+g.age+')';}
