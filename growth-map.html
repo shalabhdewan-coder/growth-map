@@ -253,7 +253,7 @@ const LEVELS={
    {n:'Two details',      wtier:'b', mini:1, write:'two'},
    {n:'Mini paragraph',   wtier:'c', mini:2, write:'para3'},
    {n:'Because & why',    wtier:'c', mini:2, write:'because'},
-   {n:'Read & answer',    wtier:'c', mini:2, write:'para3', qs:1},
+   {n:'Read & answer',    wtier:'c', mini:2, write:'order3', qs:1},
    {n:'Bridge to big-girl', wtier:'d', mini:2, write:'para3', qs:1}
   ]
  }
@@ -1056,7 +1056,8 @@ const MWRITE={
    'Write THREE sentences about your family — who they are and what you like doing together.'],
  because:['Finish this and add one more line: “My favourite day is ____ because ____.”',
    b=>'Finish this: “My favourite part of ‘'+b+'’ is ____ because ____.” Then add one more line.',
-   'Finish this and add one more line: “I like my best friend because ____.”']
+   'Finish this and add one more line: “I like my best friend because ____.”'],
+ order3:'Write THREE sentences about the story you just read above — what happened first, what happened next, and how it ended.'
 };
 function mwPick(key,book){const v=MWRITE[key]||MWRITE.word;const pick=Array.isArray(v)?P(v):v;return typeof pick==='function'?pick(book):pick;}
 // WT_ORDER — same ladder-extension tier-shift pattern as Sarah's VT_ORDER/GT_ORDER (reuses the shared
