@@ -1210,19 +1210,25 @@ function mwPick(key,book){const v=MWRITE[key]||MWRITE.word;const pick=Array.isAr
 const WT_ORDER=['a','b','c','d'];
 function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let blocks=[],ans=[];
  const effWtier=effTier(WT_ORDER,L.wtier,L.boost);
+ // Block letters are assigned sequentially at push time (not hardcoded) because C (rhyme) and D (mini
+ // story) are each independently rung-gated and no rung ever sets both L.rhyme and L.mini truthy at once
+ // — a hardcoded 'C.'/'D.' literal meant every printed worksheet skipped a letter (B straight to D, or
+ // straight to E). Same pattern as ws_english_sarah's wLetter fix for its own conditional block.
+ let letterCode=64;const nextLetter=()=>String.fromCharCode(++letterCode);
  // A about my book — no printed answer key exists (child's own book, open-ended), so it must not
  // count toward MTOTAL/mastery — same fix pattern as ws_english_sarah's Block B (commit 4bd9ee8)
  // and ws_science_mirayah's Block A (commit 413d819).
- blocks.push({h:'A. About my book — “'+book+'”',items:[
+ blocks.push({h:nextLetter()+'. About my book — “'+book+'”',items:[
    '1) Who is in the story?  ____________________',
    '2) One new word I learned:  ____________',
    '3) Draw your favourite part, then write about it.'],write:1,ungraded:true});
  // B sight words
  const sf=shuf(SIGHT[effWtier]).slice(0,4),sa=[];
- blocks.push({h:'B. Fill the gap (circle the right word)',items:sf.map((s,i)=>(i+1)+')  '+s[0]+'   ('+shuf(s[1]).join('  /  ')+')')});
- sf.forEach(s=>sa.push(s[1][0]));ans.push('B: '+sa.join(', '));
+ const bLetter=nextLetter();
+ blocks.push({h:bLetter+'. Fill the gap (circle the right word)',items:sf.map((s,i)=>(i+1)+')  '+s[0]+'   ('+shuf(s[1]).join('  /  ')+')')});
+ sf.forEach(s=>sa.push(s[1][0]));ans.push(bLetter+': '+sa.join(', '));
  // C rhyme (rung-gated)
- if(L.rhyme){const rh=shuf(RHYME).slice(0,3),ra=[];blocks.push({h:'C. Which word rhymes? (circle it)',items:rh.map((r,i)=>(i+1)+')  '+r[0]+'  →  '+shuf(r[1]).join('  /  '))});rh.forEach(r=>ra.push(r[0]+'→'+r[1][0]));ans.push('C: '+ra.join(', '));}
+ if(L.rhyme){const rh=shuf(RHYME).slice(0,3),ra=[];const cLetter=nextLetter();blocks.push({h:cLetter+'. Which word rhymes? (circle it)',items:rh.map((r,i)=>(i+1)+')  '+r[0]+'  →  '+shuf(r[1]).join('  /  '))});rh.forEach(r=>ra.push(r[0]+'→'+r[1][0]));ans.push(cLetter+': '+ra.join(', '));}
  // D mini story comprehension (rung-gated); qs:1 adds one harder inference question on top.
  // On hand-authored rungs (L.boost unset) mini also picks WHICH SLICE of the bank to draw from: mini:1
  // (rungs 3-5) draws only from MINISTORY[0-5] — concrete recall stories whose own inference question
@@ -1278,12 +1284,13 @@ function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let bloc
   const stories=boost?shuf(MINISTORY).slice(0,storyCount):[P(pool)];
   let dq=[],da=[];
   stories.forEach((ms,i)=>{dq=dq.concat(ms.q);da=da.concat(ms.a);if(i<qsCount){dq.push(ms.x);da.push(ms.xa);}});
-  blocks.push({h:'D. Read &amp; answer',passage:stories.map(s=>s.t).join('<br><br>'),items:dq,write:1});
-  ans.push('D: '+da.join(' | '));
+  const dLetter=nextLetter();
+  blocks.push({h:dLetter+'. Read &amp; answer',passage:stories.map(s=>s.t).join('<br><br>'),items:dq,write:1});
+  ans.push(dLetter+': '+da.join(' | '));
  }
  // E write — free-response writing prompt with no printed answer key; must not count toward
  // MTOTAL/mastery — same fix pattern as ws_english_sarah's Writing challenge block (commit 4bd9ee8).
- blocks.push({h:'E. My turn to write',items:[mwPick(L.write,book)],write:2,ungraded:true});
+ blocks.push({h:nextLetter()+'. My turn to write',items:[mwPick(L.write,book)],write:2,ungraded:true});
  return{title:'English Worksheet — Mirayah (6)',sub:'Level '+(li+1)+'/'+LEVELS.mirayah.english.length+' · '+L.n+'   ·   📖 '+book,level:'Age 6 · reading fluency + first sentences (joy first)',blocks,ans};}
 
 /* ---------- SCIENCE worksheet generators ---------- */
