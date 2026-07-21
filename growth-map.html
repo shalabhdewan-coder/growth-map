@@ -1162,14 +1162,22 @@ function ws_science_mirayah(li){const L=SCI_MIRAYAH[li];let blocks=[],ans=[];
 
 /* ---------- LANE PRACTICE CARDS (Swimming · Music · Riding · Madhurim) ---------- */
 function who(gk){const g=DATA[gk];return g.name+' ('+g.age+')';}
-function ws_swim(gk,li){const L=SWIM[li];return{title:'🏊 Swimming — '+who(gk),sub:'Level '+(li+1)+'/'+SWIM.length+' · '+L.n,level:'Aquatics — the spike',keyLabel:'Coach / parent notes',note:'Always swim with a coach or adult present. Technique before speed.',
+function ws_swim(gk,li){const L=SWIM[li];
+ /* SWIM's rung fields (wu/main/tech/goal) are all plain strings, so intensifyRung's
+    generic "scale every numeric field" pass has nothing to grab once a girl runs past
+    the last hand-authored rung (see growth-map-exhaustive-audit finding). `boost` (the
+    tier number set only by intensifyRung on synthetic "Independent Study" rungs — undefined
+    on hand-authored rungs 1-12) drives a real, escalating extra round here instead, so
+    each successive synthetic rung actually asks for more than the one before it. */
+ const boostNote=L.boost?' + '+L.boost+' extra round'+(L.boost>1?'s':'')+' of the main set — Independent Study tier '+L.boost:'';
+ return{title:'🏊 Swimming — '+who(gk),sub:'Level '+(li+1)+'/'+SWIM.length+' · '+L.n,level:'Aquatics — the spike',keyLabel:'Coach / parent notes',note:'Always swim with a coach or adult present. Technique before speed.',
  blocks:[
   {h:'Warm-up',items:[L.wu]},
-  {h:'Main set',items:[L.main]},
+  {h:'Main set',items:[L.main+boostNote]},
   {h:'Technique focus',items:[L.tech]},
   {h:'This session’s goal',items:['🎯 '+L.goal],write:1},
   {h:'Log — times / distances today',items:[],write:3}
- ],ans:['✅ Level up when: '+L.goal]};}
+ ],ans:['✅ Level up when: '+L.goal+(L.boost?' (plus the tier-'+L.boost+' extra round'+(L.boost>1?'s':'')+' completed)':'')]};}
 function ws_music(gk,li){const L=MUSIC[li];return{title:'🎵 Music — '+who(gk),sub:'Level '+(li+1)+'/'+MUSIC.length+' · '+L.n,level:'Graded music pathway',keyLabel:'Teacher / parent notes',note:'Little and often beats one long session. Enjoy the music.',
  blocks:[
   {h:'Technique & scales',items:[L.tech]},
@@ -1178,20 +1186,31 @@ function ws_music(gk,li){const L=MUSIC[li];return{title:'🎵 Music — '+who(gk
   {h:'Aural / listening',items:[L.aural]},
   {h:'Practice time',items:['Aim for about '+L.mins+' minutes today.'],write:1}
  ],ans:['✅ Level up when: this rung’s piece is performance-ready and the scales are secure.']};}
-function ws_riding(gk,li){const L=RIDE[li];return{title:'🐴 Riding — '+who(gk),sub:'Level '+(li+1)+'/'+RIDE.length+' · '+L.n,level:'Horsemanship pathway',keyLabel:'Instructor / parent notes',note:'Always ride with an instructor, helmet and boots. Confidence before challenge.',
+function ws_riding(gk,li){const L=RIDE[li];
+ /* Same dead-flag class as ws_swim: RIDE's fields (ground/flat/ex/safe) are all plain
+    strings, so intensifyRung's generic numeric scaling has nothing to grab past the last
+    hand-authored rung. `boost` drives a real, escalating repeat count here instead. */
+ const boostNote=L.boost?' — repeat '+L.boost+' extra time'+(L.boost>1?'s':'')+' for polish (Independent Study tier '+L.boost+')':'';
+ return{title:'🐴 Riding — '+who(gk),sub:'Level '+(li+1)+'/'+RIDE.length+' · '+L.n,level:'Horsemanship pathway',keyLabel:'Instructor / parent notes',note:'Always ride with an instructor, helmet and boots. Confidence before challenge.',
  blocks:[
   {h:'On the ground',items:[L.ground==='—'?'Quick check & warm-up walk':L.ground]},
   {h:'Flatwork focus',items:[L.flat]},
-  {h:'Today’s exercise',items:[L.ex],write:1},
+  {h:'Today’s exercise',items:[L.ex+boostNote],write:1},
   {h:'Safety reminder',items:['⚠️ '+L.safe]},
   {h:'Log — how it went',items:[],write:2}
- ],ans:['✅ Level up when: '+L.ex.toLowerCase()+' feels balanced and safe.']};}
-function ws_madhurim(gk,li){const L=GIVE[li];return{title:'🤝 Madhurim — '+who(gk),sub:'Level '+(li+1)+'/'+GIVE.length+' · '+L.n,level:'Service & leadership — the differentiator',keyLabel:'Parent / mentor notes',note:'Kindness first. Small, real actions add up to something big.',
+ ],ans:['✅ Level up when: '+L.ex.toLowerCase()+' feels balanced and safe.'+(L.boost?' Plus the tier-'+L.boost+' extra repeats.':'')]};}
+function ws_madhurim(gk,li){const L=GIVE[li];
+ /* Same dead-flag class as ws_swim/ws_riding: GIVE's fields (action/reflect/impact) are all
+    plain strings, so intensifyRung's generic numeric scaling has nothing to grab past the
+    last hand-authored rung. `boost` drives a real, escalating scope multiplier here instead. */
+ const scale=L.boost?1+L.boost:1;
+ const boostNote=L.boost?' — Independent Study tier '+L.boost+': scale this up to '+scale+'× the usual scope (more people helped / more sessions / more collected)':'';
+ return{title:'🤝 Madhurim — '+who(gk),sub:'Level '+(li+1)+'/'+GIVE.length+' · '+L.n,level:'Service & leadership — the differentiator',keyLabel:'Parent / mentor notes',note:'Kindness first. Small, real actions add up to something big.',
  blocks:[
-  {h:'This week’s action',items:[L.action],write:1},
+  {h:'This week’s action',items:[L.action+boostNote],write:1},
   {h:'Reflect',items:['💭 '+L.reflect],write:2},
-  {h:'Impact log — what actually happened',items:['Target: '+L.impact],write:2}
- ],ans:['✅ Level up when: '+L.impact.toLowerCase()+'.']};}
+  {h:'Impact log — what actually happened',items:['Target: '+L.impact+(L.boost?' × '+scale:'')],write:2}
+ ],ans:['✅ Level up when: '+L.impact.toLowerCase()+'.'+(L.boost?' (scaled '+scale+'× for Independent Study tier '+L.boost+')':'')]};}
 
 const GENS={
  sarah:{english:ws_english_sarah,maths:ws_maths_sarah,science:ws_science_sarah,
