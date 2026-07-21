@@ -648,6 +648,14 @@ function m_mistake(L){const easy=[
   ['A child wrote:  3x = 21, so x = 21 + 3 = 24.  Find the mistake and fix it.','wrong — to undo “×3” you divide by 3, not add: x = 21 ÷ 3 = 7']];
  const longmulBank=[
   ['A child worked out 34 × 26 like this:  34 × 6 = 204,  then 34 × 2 = 68,  then 204 + 68 = 272.  Find the mistake and fix it.','wrong — the “2” is really 2 tens (20), so that partial product must be shifted one place left: 34 × 20 = 680, not 68; correct total = 204 + 680 = 884']];
+ const algebra2Bank=[
+  ['A child wrote:  2x + 3 = 11, so x = 11 + 3 − 2 = 12.  Find the mistake and fix it.','wrong — undo “+3” first by subtracting (2x = 8), then undo “×2” by dividing: x = 4, not 12'],
+  ['A child wrote:  5x − 4 = 16, so x = 16 − 4 ÷ 5 = 15.2.  Find the mistake and fix it.','wrong — undo “−4” first by adding (5x = 20), then divide by 5: x = 4, not 15.2']];
+ const compBank=[
+  ['A child wrote:  “If a square’s side doubles, its area doubles too.”  Is this correct? Explain using an example.','wrong — area is side², so doubling the side makes the area 4× bigger, not 2×; e.g. side 3→6: area 9→36'],
+  ['A child wrote:  “A number is increased by 20%, then decreased by 20%, so it ends up back where it started.”  Is this correct? Explain with an example.','wrong — the two 20%s are taken from different amounts; e.g. 100 → 120 (+20%) → 96 (−20% of 120) — you end up with 96, not 100']];
+ const proofBank=[
+  ['A child wrote:  “Every prime number is odd, so adding two primes always gives an even number.”  Find the flaw in this reasoning and give a counterexample.','flawed — 2 is a prime number that is even; 2 + 3 = 5, which is odd, so the claim breaks down whenever 2 is one of the primes']];
  let bank=(L.chal>=3)?hard:easy;
  if(L.frac&&L.chal<3)bank=bank.concat(fracEasy);
  if(L.longmul)bank=bank.concat(longmulBank);
@@ -655,6 +663,9 @@ function m_mistake(L){const easy=[
  if(L.ratio)bank=bank.concat(ratioBank);
  if(L.pct)bank=bank.concat(pctBank);
  if(L.algebra>=1)bank=bank.concat(algebraBank);
+ if(L.algebra>=2)bank=bank.concat(algebra2Bank);
+ if(L.comp)bank=bank.concat(compBank);
+ if(L.proof)bank=bank.concat(proofBank);
  const m=P(bank);return{h:'E. Find the mistake (be the teacher)',items:[m[0]],write:2,a:'E: '+m[1]};}
 
 const CHAL={
