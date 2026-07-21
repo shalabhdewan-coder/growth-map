@@ -41,7 +41,32 @@ hand-authored rungs 1-10, so `effWtier===L.wtier` there, mathematically (not jus
 Every 3 "Independent Study" levels shifts one tier; since `intensifyRung` clones rung 10 (`wtier:'c'`), the
 first shift (boost≥3) reaches `SIGHT.d` in one step.
 
-## Decision: `MINISTORY` does not need a "harder" pool
+## SUPERSEDED — `MINISTORY` decision reversed (2026-07-21)
+
+The section below was the original call made when this doc was written, and its Verification section
+(further below) was validated against that state. **Both are now stale.** A later fix, commit `a629086`
+("fix(english/mirayah): rung 10 ..."), changed rung 10's *own* config from `wtier:'c'` to `wtier:'d'` — a
+correct fix for the rung9→10 transition, but it meant `intensifyRung` now clones a base rung that is
+*already* at `WT_ORDER`'s ceiling tier (`WT_ORDER=['a','b','c','d']`). Every subsequent boost level clamps
+at `'d'` via `effTier()` — the tier-shift mechanism this doc describes below has been completely inert
+since that commit; there is no headroom left in `WT_ORDER`/`SIGHT` for it to shift into.
+
+That left `mini`/`qs` as the only knobs `intensifyRung` still scales that could carry any further
+escalation once `wtier` is maxed. The original reasoning below ("they stay truthy at every boost level ...
+so the extra-question mechanism keeps firing") was true but was the bug, not a mitigation: staying truthy
+forever is exactly why nothing escalated past rung 10 — a boolean check can't express "and now do it more."
+
+**Decision reversed:** `ws_english_mirayah`'s Block D now reads `mini`/`qs` by *magnitude*, not just
+truthiness, on synthetic rungs (`L.boost` set): the number of `MINISTORY` passages drawn scales with `mini`
+(`Math.min(MINISTORY.length, L.mini-1)`, min 1), and how many of those passages carry their own harder
+`x`/`xa` inference question scales with `qs` (`Math.min(storyCount, L.qs)`). This reuses the same 12-entry
+`MINISTORY` pool — no new pool built, no new curriculum content invented — and is bounded by
+`MINISTORY.length` so it can't run past the bank. Hand-authored rungs (`L.boost` unset) are byte-for-byte
+unaffected: exactly one passage, plus the extra question only when `qs` is truthy, same as before this fix.
+
+## Original doc (kept for history — see superseding note above)
+
+### Decision: `MINISTORY` does not need a "harder" pool
 
 Per the task brief's own steer ("use judgment... don't over-build"): **not added.** Reasoning:
 - `MINISTORY` was never tiered per rung to begin with — the same 12-entry pool already serves *every*
@@ -57,7 +82,8 @@ Per the task brief's own steer ("use judgment... don't over-build"): **not added
   rung's own knobs call for — consistent with how Sarah's rungs 9-12 deliberately reused the existing
   tier-3 `PASSAGES` pool rather than building a parallel one (`content/english-sarah-rung9.md`).
 
-## Verification
+### Verification (validated against the pre-`a629086` state — rung 10 was still `wtier:'c'` — see
+superseding note above; no longer representative of current behavior)
 
 - `node --check` on the extracted `<script>` block: pass.
 - Ran `ws_english_mirayah(li,book)` via the same `vm`-sandboxed harness at boost 0, 3, 6, 9 (reached via
@@ -73,3 +99,24 @@ Per the task brief's own steer ("use judgment... don't over-build"): **not added
 - `SIGHT.d.length===6` — bank size as documented above.
 - Rungs 1-10 (indices 0,3,6,9 sampled directly, `L.boost===undefined` throughout) all render with zero
   bad-content hits and unchanged tier selection — confirms boost=0 behavior is unaffected by this change.
+
+## Current verification (2026-07-21, post-`a629086` + Block D magnitude fix)
+
+Live-generated `ws_english_mirayah(li,'Test Book')` via the node harness in the audit skill, walking
+synthetic rungs built the same way `doDoneLevelUp` builds them (`intensifyRung(lad[lad.length-1], tier)`
+repeatedly from rung 10):
+
+| rung | boost | mini | qs | passages in Block D | Block D question count |
+|------|-------|------|----|--------------------------|-------------------------|
+| 9 (base, "Bridge to big-girl") | — | 2 | 1 | 1 | 3 |
+| 10 ("Independent Study 1") | 1 | 3 | 2 | 2 | 8 |
+| 11 ("Independent Study 2") | 2 | 4 | 3 | 3 | 11 |
+| 12 ("Independent Study 3") | 3 | 6 | 5 | 5 | 19 |
+| 13 ("Independent Study 4") | 4 | 10 | 8 | 9 | 33 |
+
+Confirmed: each rung's `ans` array stays correctly aligned to its `items` array (per-story `q`/`a` pairs
+followed by that story's `x`/`xa` when included), passage text differs per rung (different `MINISTORY`
+entries drawn), and `node --check` passes on the full extracted script. `effWtier` is confirmed stuck at
+`'d'` for every rung 9 and above (the tier-shift mechanism above is inert, as described in the superseding
+note) — the escalation from rung 10 onward now comes entirely from Block D's passage/question count
+growth, not from `SIGHT` tier.

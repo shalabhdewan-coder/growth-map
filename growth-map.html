@@ -1072,10 +1072,25 @@ function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let bloc
  sf.forEach(s=>sa.push(s[1][0]));ans.push('B: '+sa.join(', '));
  // C rhyme (rung-gated)
  if(L.rhyme){const rh=shuf(RHYME).slice(0,3),ra=[];blocks.push({h:'C. Which word rhymes? (circle it)',items:rh.map((r,i)=>(i+1)+')  '+r[0]+'  →  '+shuf(r[1]).join('  /  '))});rh.forEach(r=>ra.push(r[0]+'→'+r[1][0]));ans.push('C: '+ra.join(', '));}
- // D mini story comprehension (rung-gated); qs:1 (rungs 9-10) adds one harder inference question on top
- if(L.mini){const ms=P(MINISTORY);let dq=ms.q.slice(),da=ms.a.slice();
-   if(L.qs){dq=dq.concat([ms.x]);da=da.concat([ms.xa]);}
-   blocks.push({h:'D. Read &amp; answer',passage:ms.t,items:dq,write:1});ans.push('D: '+da.join(' | '));}
+ // D mini story comprehension (rung-gated); qs:1 (rungs 9-10) adds one harder inference question on top.
+ // On hand-authored rungs (L.boost unset) this is exactly the old behaviour: one passage, plus the extra
+ // question when qs is set. On synthetic "Independent Study" rungs (L.boost set by intensifyRung), mini
+ // and qs used to just stay truthy forever — intensifyRung kept scaling their numeric values (2→3→4...,
+ // 1→2→3...) but ws_english_mirayah only ever read them as booleans, so nothing past rung 10 actually got
+ // harder (see content/english-mirayah-boost.md history). Fix: once boosted, read the magnitude instead —
+ // more MINISTORY passages as `mini` grows, and more of those passages carry their own harder inference
+ // question as `qs` grows. Reuses the bank's existing 12 full stories (each already has its own x/xa
+ // question) — no new curriculum content invented. Bounded by MINISTORY.length so it can't overrun the bank.
+ if(L.mini){
+  const boost=L.boost||0;
+  const storyCount=boost?Math.max(1,Math.min(MINISTORY.length,L.mini-1)):1;
+  const qsCount=boost?Math.min(storyCount,L.qs||0):(L.qs?1:0);
+  const stories=boost?shuf(MINISTORY).slice(0,storyCount):[P(MINISTORY)];
+  let dq=[],da=[];
+  stories.forEach((ms,i)=>{dq=dq.concat(ms.q);da=da.concat(ms.a);if(i<qsCount){dq.push(ms.x);da.push(ms.xa);}});
+  blocks.push({h:'D. Read &amp; answer',passage:stories.map(s=>s.t).join('<br><br>'),items:dq,write:1});
+  ans.push('D: '+da.join(' | '));
+ }
  // E write
  blocks.push({h:'E. My turn to write',items:[mwPick(L.write,book)],write:2});
  return{title:'English Worksheet — Mirayah (6)',sub:'Level '+(li+1)+'/'+LEVELS.mirayah.english.length+' · '+L.n+'   ·   📖 '+book,level:'Age 6 · reading fluency + first sentences (joy first)',blocks,ans};}
