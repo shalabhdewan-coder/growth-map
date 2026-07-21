@@ -1162,7 +1162,7 @@ function ws_science_sarah(li){const L=SCI_SARAH[li];let blocks=[],ans=[];
  const me=boost?[L.method[L.method.length-1]].concat(shuf(L.method.slice(0,-1)).slice(0,Math.min(L.method.length,1+boost)-1)):[P(L.method)];
  blocks.push({h:'D. Like a scientist 🧪',items:me.map(m=>m[0]),write:3});
  ans.push('D: '+me.map(m=>m[1]).join(' | '));
- blocks.push({h:'E. Try it at home (safe — with a grown-up)',items:[L.lab],write:2});
+ blocks.push({h:'E. Try it at home (safe — with a grown-up)',items:[L.lab],write:2,ungraded:true});
  return{title:'Science Worksheet — Sarah (8)',sub:'Level '+(li+1)+'/'+SCI_SARAH.length+' · '+L.n,level:sciLevelTag(li),blocks,ans};}
 function ws_science_mirayah(li){const L=SCI_MIRAYAH[li];let blocks=[],ans=[];
  // `boost` is only ever set by intensifyRung on synthetic "Independent Study" rungs past
