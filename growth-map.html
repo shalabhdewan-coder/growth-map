@@ -252,7 +252,7 @@ const LEVELS={
    {n:'Retell it',        wtier:'b', mini:1, write:'retell', qs:1},
    {n:'Two details',      wtier:'b', mini:2, write:'two'},
    {n:'Mini paragraph',   wtier:'c', mini:2, write:'para3'},
-   {n:'Because & why',    wtier:'c', mini:2, write:'because'},
+   {n:'Because & why',    wtier:'c', mini:3, write:'because'},
    {n:'Read & answer',    wtier:'c', mini:2, write:'order3', qs:1},
    {n:'Bridge to big-girl', wtier:'d', mini:2, write:'para3', qs:1}
   ]
@@ -1172,11 +1172,20 @@ function ws_english_mirayah(li,book){const L=LEVELS.mirayah.english[li];let bloc
  // real difficulty jump mini:2 already gives rung 7, just reached one rung sooner. No new curriculum
  // content: both fixes only flip existing knobs (qs, mini) that ws_english_mirayah already reads
  // correctly for every other rung.
+ // Rungs 7-8 ('Mini paragraph'/'Because & why') were BOTH mini:2 — identical wtier:'c', identical
+ // MINISTORY[6-11] pool, one random story each, no qs on either — so a confirmed level-up from 7→8
+ // changed nothing gradable (Block B same SIGHT.c pool, Block D same 6-story pool); only the ungraded
+ // Block E prompt text differed. Fixed by giving rung 8 'Because & why' mini:3, which narrows its
+ // pool to MINISTORY[9-11] — the fly/monkey/crow fable trio, whose own regular (non-x) recall
+ // questions already lean on causal "why/how" reasoning ("How did the fly finally remember his
+ // name?", "Why did the other crows laugh?") rather than plain fact lookup — a genuine, thematically-
+ // fitting escalation for a "because" rung, reusing only the bank's existing stories. Rung 7 keeps
+ // mini:2 (full 6-story pool) unchanged, so it stays distinct from rung 8's narrower fable-only slice.
  if(L.mini){
   const boost=L.boost||0;
   const storyCount=boost?Math.max(1,Math.min(MINISTORY.length,L.mini-1)):1;
   const qsCount=boost?Math.min(storyCount,L.qs||0):(L.qs?1:0);
-  const pool=boost?MINISTORY:(L.mini>=2?MINISTORY.slice(6):MINISTORY.slice(0,6));
+  const pool=boost?MINISTORY:(L.mini>=3?MINISTORY.slice(9):(L.mini>=2?MINISTORY.slice(6):MINISTORY.slice(0,6)));
   const stories=boost?shuf(MINISTORY).slice(0,storyCount):[P(pool)];
   let dq=[],da=[];
   stories.forEach((ms,i)=>{dq=dq.concat(ms.q);da=da.concat(ms.a);if(i<qsCount){dq.push(ms.x);da.push(ms.xa);}});
