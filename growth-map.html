@@ -732,11 +732,17 @@ function ws_maths_sarah(li){const L=LEVELS.sarah.maths[li];let blocks=[],ans=[];
  if(L.geom){const ge=m_geometry(L);blocks.push({h:ge.h,items:ge.items,write:ge.write});ans.push(ge.a);}
  if(L.logic){const lg=m_logic(L);blocks.push({h:lg.h,items:lg.items,write:lg.write});ans.push(lg.a);}
  let chalPool=CHAL[L.chal]||CHAL[3];
- // rungs 5-7 all set chal:3 (same 3-item base pool) — without these, a child sees the identical
- // ★ Challenge pool at three consecutive named tiers. Differentiate using flags already unique to
- // each rung, reusing already-authored harder pools (no new curriculum content invented).
+ // Several same-chal adjacent-rung pairs share the identical 3-item base pool with nothing to
+ // differentiate the ★ Challenge block across that level-up. Fixed previously for the chal:3 trio
+ // (rungs 5-7) below; this block extends the same technique — concat an already-authored harder
+ // pool, gated on a flag unique to the SECOND rung of each duplicate pair — to the three remaining
+ // duplicate pairs: rungs 1-2 (chal:1, mul2 unique to rung 2), rungs 3-4 (chal:2, frac unique to
+ // rung 4), and rungs 8-9 (chal:4, algebra unique to rung 9). No new curriculum content invented.
+ if(L.chal===1&&L.mul2&&CHAL[2])chalPool=chalPool.concat(CHAL[2]);
+ if(L.chal===2&&L.frac&&CHAL[3])chalPool=chalPool.concat(CHAL[3]);
  if(L.frac&&L.longmul&&CHAL[4])chalPool=chalPool.concat(CHAL[4]);
  if(L.ratio&&CHAL.comp)chalPool=chalPool.concat(CHAL.comp);
+ if(L.chal===4&&L.algebra&&CHAL[5])chalPool=chalPool.concat(CHAL[5]);
  if(L.comp&&CHAL.comp)chalPool=chalPool.concat(CHAL.comp);
  const ch=P(chalPool);blocks.push({h:'★ Challenge — think hard, take your time'+(L.comp?' (competition-style)':''),items:[ch[0]],write:4});ans.push('★: '+ch[1]);
  if(L.proof){blocks.push({h:'★★ Prove it',items:['Explain, in your own words and with an example, WHY the challenge answer above must be true.'],write:4});ans.push('★★: reward a clear reason + a worked example.');}
