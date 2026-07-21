@@ -59,6 +59,17 @@
   .tip{font-size:11px;color:var(--muted);text-align:center;margin-top:10px}
   #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:#0f1226;border:1px solid var(--give);color:var(--ink);padding:10px 16px;border-radius:12px;font-size:13px;opacity:0;transition:.25s;pointer-events:none;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.4)}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .masteryOverlay{position:fixed;inset:0;background:rgba(6,8,16,.72);z-index:60;display:flex;align-items:center;justify-content:center;padding:20px}
+  .masteryCard{background:var(--card,#171a26);border:1px solid var(--line);border-radius:16px;padding:22px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .masteryCard h3{margin:0 0 10px}
+  .masteryQ{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:14px}
+  .masteryQ b{color:#ffe9a8}
+  .masteryRow{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:8px}
+  .masteryRow input{width:64px;text-align:center;font-size:20px;font-weight:700;background:#0f1226;border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:8px}
+  .mStep{padding:8px 14px;font-size:18px;line-height:1}
+  .masteryNeed{font-size:11.5px;color:var(--muted);text-align:center;margin-bottom:16px}
+  .masteryActions{display:flex;flex-direction:column;gap:8px}
+  .masteryActions .btn{width:100%}
   /* paper sheet (shared by preview + print + download) */
   .sheet{font-family:Georgia,'Times New Roman',serif;color:#1c2230;max-width:820px;margin:0 auto;padding:26px}
   .sheet h1{font-size:22px;text-align:center;margin:0}
@@ -103,6 +114,23 @@
 </div></div>
 <div id="printRoot"></div>
 <div id="toast"></div>
+<div id="masteryOverlay" class="masteryOverlay" style="display:none">
+  <div class="masteryCard">
+    <h3>📋 Mastery check</h3>
+    <div class="masteryQ">Check their answers against the answer key. How many did they get right out of <b id="mTotal">0</b>?</div>
+    <div class="masteryRow">
+      <button class="btn mStep" data-d="-1">−</button>
+      <input id="mCorrect" type="number" min="0" value="0" inputmode="numeric">
+      <button class="btn mStep" data-d="1">+</button>
+    </div>
+    <div class="masteryNeed" id="mNeed"></div>
+    <div class="masteryActions">
+      <button class="btn" id="mCancel">Cancel</button>
+      <button class="btn" id="mRetry">📝 Practice again (same level)</button>
+      <button class="btn donebtn" id="mConfirm">✓ Confirm & level up</button>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ============================================================
@@ -1132,11 +1160,41 @@ function downloadWS(){if(!CURWS){toast('Press “Make worksheet” first.');retu
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([doc],{type:'text/html'}));a.download=CURWS.title.replace(/[^a-z0-9]+/gi,'-')+'-L'+(LEVEL[CURGK][CURSK]+1)+'.html';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(a.href),1500);}
 
 /* ===== THE STEP GAME: Done → level up → next sheet ===== */
-function doneLevelUp(gk,sk){const lad=LEVELS[gk][sk];
+function isAcad(sk){return sk==='english'||sk==='maths'||sk==='science';}
+const MASTERY_PASS=0.8; /* need 80%+ correct (per answer key) to level up an academic subject */
+
+function doDoneLevelUp(gk,sk){const lad=LEVELS[gk][sk];
  if(LEVEL[gk][sk]>=lad.length-1)lad.push(intensifyRung(lad[lad.length-1],lad.length-BASE_LADDER_LEN[gk][sk]+1));
  LEVEL[gk][sk]++;save();renderSub(gk,sk);makeWS(gk,sk);toast('⬆️ Level up! Now: '+lad[LEVEL[gk][sk]].n);
 }
+function doneLevelUp(gk,sk){
+ if(!isAcad(sk)){doDoneLevelUp(gk,sk);return;} /* lane subjects (swimming/music/riding/madhurim) have no answer key — honor system stays */
+ openMasteryCheck(gk,sk);
+}
 function stepDown(gk,sk){const lad=LEVELS[gk][sk];if(LEVEL[gk][sk]>0){LEVEL[gk][sk]--;save();renderSub(gk,sk);makeWS(gk,sk);toast('↩︎ Stepped back to: '+lad[LEVEL[gk][sk]].n);}else toast('Already at the first rung.');}
+
+/* ===== MASTERY GATE: level-up on an academic subject requires a scored worksheet ===== */
+let MGK=null, MSK=null, MTOTAL=0;
+function wsQuestionCount(ws){return ws.blocks.reduce((n,b)=>n+(b.items?b.items.length:0),0);}
+function openMasteryCheck(gk,sk){
+ if(CURGK!==gk||CURSK!==sk||!CURWS){toast('Press “Make worksheet” first, mark it against the answer key, then Done.');return;}
+ MGK=gk;MSK=sk;MTOTAL=wsQuestionCount(CURWS)||1;
+ document.getElementById('mTotal').textContent=MTOTAL;
+ const need=Math.ceil(MTOTAL*MASTERY_PASS);
+ document.getElementById('mNeed').textContent='Need '+need+'/'+MTOTAL+' ('+Math.round(MASTERY_PASS*100)+'%+) to level up. Below that → fresh practice sheet at the same level.';
+ const input=document.getElementById('mCorrect');input.max=MTOTAL;input.value=MTOTAL;
+ document.getElementById('masteryOverlay').style.display='flex';
+}
+function closeMasteryCheck(){document.getElementById('masteryOverlay').style.display='none';MGK=null;MSK=null;}
+function confirmMastery(){
+ const gk=MGK,sk=MSK;if(!gk||!sk)return;
+ const correct=Math.max(0,Math.min(MTOTAL,parseInt(document.getElementById('mCorrect').value,10)||0));
+ const need=Math.ceil(MTOTAL*MASTERY_PASS);
+ closeMasteryCheck();
+ if(correct>=need){doDoneLevelUp(gk,sk);}
+ else{makeWS(gk,sk);toast('Not yet — '+correct+'/'+MTOTAL+' (needed '+need+'+). Fresh sheet at the same level — practice again.');}
+}
+function retryMastery(){const gk=MGK,sk=MSK;closeMasteryCheck();if(gk&&sk){makeWS(gk,sk);toast('📝 Fresh practice sheet — same level.');}}
 
 function toast(msg){const t=document.getElementById('toast');if(!t)return;t.textContent=msg;t.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.remove('show'),2600);}
 
@@ -1243,6 +1301,16 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
  document.querySelectorAll('.pane').forEach(x=>x.classList.remove('active'));
  t.classList.add('active');document.getElementById('pane-'+t.dataset.pane).classList.add('active');
  if(t.dataset.pane==='overview')buildOverview();}));
+
+/* ===== MASTERY MODAL WIRING ===== */
+document.getElementById('mCancel').addEventListener('click',closeMasteryCheck);
+document.getElementById('mRetry').addEventListener('click',retryMastery);
+document.getElementById('mConfirm').addEventListener('click',confirmMastery);
+document.querySelectorAll('.mStep').forEach(b=>b.addEventListener('click',()=>{
+ const input=document.getElementById('mCorrect'),d=parseInt(b.dataset.d,10);
+ input.value=Math.max(0,Math.min(MTOTAL,(parseInt(input.value,10)||0)+d));
+}));
+document.getElementById('masteryOverlay').addEventListener('click',e=>{if(e.target.id==='masteryOverlay')closeMasteryCheck();});
 
 /* ===== INIT ===== */
 load();
