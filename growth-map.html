@@ -242,7 +242,7 @@ const LEVELS={
    {n:'Regrouping',         addMax:99, subMax:99, bonds:100, count:[10],      story:2, shapes:2, place:1, regroup:1, bondsForm:2, bondsReps:6},
    {n:'Groups of 2·5·10',   addMax:99, subMax:99, bonds:100, count:[2,5,10],  story:2, shapes:0, mul:1, mulMax:40, regroup:1, bondsForm:2, bondsReps:7},
    {n:'Two-step (little)',  addMax:99, subMax:99, bonds:100, count:[2,5,10],  story:2, shapes:0, mul:1, mulMax:60, twostep:1, regroup:2, bondsForm:2, bondsReps:8},
-   {n:'Bridge to big-girl', addMax:99, subMax:99, bonds:100, count:[3,4,6],   story:2, shapes:0, mul:1, mulMax:90, twostep:2, regroup:2, bondsForm:2, bondsReps:9}
+   {n:'Bridge to big-girl', addMax:99, subMax:99, bonds:100, count:[3,4,6],   story:2, shapes:0, mul:1, mulMax:90, twostep:2, regroup:3, bondsForm:2, bondsReps:9}
   ],
   english:[
    {n:'Sight words',      wtier:'a', mini:0, write:'word'},
@@ -709,14 +709,23 @@ function m_algebra(L){const B=[],a=[];const bo=L.boost||0;
    B.push('5)  Magic square — every row, column and diagonal adds to the same total. Use the row/column totals to find the two missing numbers (?):<br>'+rows);
    const[lo,hi]=[r1,b2].sort((x,y)=>x-y);
    a.push('missing = '+grid[lo]+' and '+grid[hi]);}
+ if(L.proof){
+   // Variable-on-both-sides linear equation — a genuinely harder item shape than the algebra:1-3
+   // tiers above (which never go past a single-side linear equation). Gated on L.proof, which is
+   // only ever set on the final rung, so this item only appears there.
+   const x=R(3,10+bo),m=R(3,6+bo),m2=R(1,m-1),c1=R(1,15+2*bo),c2=c1+(m-m2)*x,m2d=m2===1?'x':m2+'x';
+   B.push('6)  '+m+'x + '+c1+' = '+m2d+' + '+c2+'      x = ____');a.push('x = '+x);}
  return{h:'F. Algebra — find the unknown (show your working)',items:B,write:2,a:'F: '+a.join('; ')};}
 
-function m_geometry(L){const n=(L&&L.comp)?5:4,opt=R(0,n-1),ch=(L&&L.chal)||5,bo=((L&&L.boost)||0)+Math.max(0,ch-5)*3;
+function m_geometry(L){const n=(L&&L.proof)?6:(L&&L.comp)?5:4,opt=R(0,n-1),ch=(L&&L.chal)||5,bo=((L&&L.boost)||0)+Math.max(0,ch-5)*3;
  if(opt===0){const l=R(4,12+bo),w=R(3,9+bo);return{h:'G. Geometry — a rectangle',items:['A rectangle is '+l+' cm long and '+w+' cm wide. Find its area and its perimeter.'],write:2,a:'G: area = '+(l*w)+' cm², perimeter = '+(2*(l+w))+' cm'};}
  if(opt===1){const a1=R(30,80),a2=R(30,150-a1);return{h:'G. Geometry — a triangle',items:['Two angles of a triangle are '+a1+'° and '+a2+'°. Find the third angle.'],write:2,a:'G: '+(180-a1-a2)+'°'};}
  if(opt===2){const b=R(4,12+bo),h=R(2,5+bo)*2;return{h:'G. Geometry — a triangle’s area',items:['A triangle has base '+b+' cm and height '+h+' cm. Find its area.'],write:2,a:'G: '+(b*h/2)+' cm²'};}
  if(opt===3){const l1=R(7,14+bo),w1=R(5,9+bo),l2=R(2,5+bo),w2=R(2,4+bo),tot=l1*w1+l2*w2;return{h:'G. Geometry — a composite shape',items:['A room is an L-shape made of two rectangles: '+l1+' m × '+w1+' m, plus a smaller '+l2+' m × '+w2+' m section. Find the total floor area.'],write:3,a:'G: '+tot+' m²'};}
- const big=R(10,16+bo),cut=R(2,5+bo),tot=big*big,shaded=tot-cut*cut;return{h:'G. Geometry — a shaded region',items:['A square garden is '+big+' m × '+big+' m. A square pond '+cut+' m × '+cut+' m is built in one corner. Find the area of the garden NOT covered by the pond.'],write:3,a:'G: '+shaded+' m²'};}
+ if(opt===4){const big=R(10,16+bo),cut=R(2,5+bo),tot=big*big,shaded=tot-cut*cut;return{h:'G. Geometry — a shaded region',items:['A square garden is '+big+' m × '+big+' m. A square pond '+cut+' m × '+cut+' m is built in one corner. Find the area of the garden NOT covered by the pond.'],write:3,a:'G: '+shaded+' m²'};}
+ // Quadrilateral angle sum (360°) — the natural next step up from the triangle angle-sum item
+ // (opt 1, 180°) above; only reachable when n=6, which only happens when L.proof is set (final rung).
+ const a1=R(50,100),a2=R(50,100),a3=R(50,100);return{h:'G. Geometry — a quadrilateral',items:['Three angles of a quadrilateral are '+a1+'°, '+a2+'° and '+a3+'°. Find the fourth angle.'],write:2,a:'G: '+(360-a1-a2-a3)+'°'};}
 
 /* Deduction/ordering puzzle — same logical skeleton as 1999 AMC 8 Problem 6 (5 people,
    comparison clues, asks who has the LEAST even though the full order can't be pinned down).
@@ -794,27 +803,42 @@ function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans
   blocks.push({h:'A. Number bonds to '+bTarget,two:true,items:nb});ans.push('A: '+a.join(', '));}
  // B add — regroup:1 (rungs 6-7) forces real carrying (NCERT ch.6 "36+47=83": ones 6+7=13 carries a ten),
  // not merely allow it: ones digits are picked so xo+yo>=10 every time, tens picked so the sum stays <=cap.
- // regroup:2 (rungs 8-9 "Two-step (little)"/"Bridge to big-girl") was previously identical to regroup:1 —
- // addMax/subMax/bonds cap out at 99/99/100 for all four rungs so single-carry alone can't escalate any
- // further (confirmed: 200-sample stats showed near-identical A/B/C ranges across rungs 6-9). Fixed: for
- // regroup:2 the tens digits are now ALSO forced to sum >=9 (so tens+carry-in >=10), pushing the answer
- // into 3 digits — e.g. 68+57=125 — a genuine "bridge to big-girl" escalation (applying the same
- // regrouping rule Mirayah already knows one more time), not new content.
+ // regroup:2 (rung 8 "Two-step (little)") was previously identical to regroup:1 — addMax/subMax/bonds cap
+ // out at 99/99/100 for all four rungs so single-carry alone can't escalate any further (confirmed:
+ // 200-sample stats showed near-identical A/B/C ranges across rungs 6-9). Fixed: for regroup:2 the tens
+ // digits are now ALSO forced to sum >=9 (so tens+carry-in >=10), pushing the answer into 3 digits —
+ // e.g. 68+57=125 — a genuine "bridge to big-girl" escalation (applying the same regrouping rule Mirayah
+ // already knows one more time), not new content.
+ // regroup:3 (rung 10 "Bridge to big-girl" only) fixed a second plateau: rungs 9 and 10 both set
+ // regroup:2, so this block, Block C and Block G's bridge branch were statistically indistinguishable
+ // across the ladder's last two rungs (300-sample check: rung9 Block B range 100-198 vs rung10 100-197).
+ // regroup:3 escalates from "2-digit+2-digit carrying into 3 digits" to "3-digit+2-digit carrying across
+ // BOTH the ones and the tens into the hundreds" (e.g. 168+57=225) — x is now seeded as a 3-digit number
+ // (100+tens+ones) and the tens digits are still forced to sum >=9, so the carry cascades one place
+ // further than regroup:2, a genuine next step on the same NCERT ch.6 renaming/regrouping ladder.
  {let ad=[],a=[];for(let i=0;i<6;i++){const cap=L.addMax||10;let x,y;
-  if(L.regroup>=2){const xo=R(1,9),yo=R(10-xo,9),xt=R(4,9),yt=R(Math.max(1,9-xt),9);x=xt*10+xo;y=yt*10+yo;}
+  if(L.regroup>=3){const xo=R(1,9),yo=R(10-xo,9),xt=R(5,9),yt=R(Math.max(1,9-xt),9);x=100+xt*10+xo;y=yt*10+yo;}
+  else if(L.regroup>=2){const xo=R(1,9),yo=R(10-xo,9),xt=R(4,9),yt=R(Math.max(1,9-xt),9);x=xt*10+xo;y=yt*10+yo;}
   else if(L.regroup){const xo=R(1,9),yo=R(10-xo,9),tmax=Math.max(1,Math.floor((cap-xo-yo)/20)),xt=R(1,tmax),yt=R(1,tmax);x=xt*10+xo;y=yt*10+yo;}
   else{x=R(2,Math.floor(cap*0.6));y=R(2,Math.max(2,cap-x));}
   ad.push((i+1)+')  '+x+' + '+y+' = ____');a.push(x+y);}blocks.push({h:'B. Add it up',two:true,items:ad});ans.push('B: '+a.join(', '));}
  // C subtract (if any) — regroup:1 (rungs 6-7) forces real borrowing (NCERT ch.6 "46−18=28": "opens 1
  // garland" because ones 6<8), same fix pattern as block B: ones digits picked so xo<yo every time (borrow
- // forced), tens digits picked so x>y always holds. regroup:2 (rungs 8-9) was likewise identical to
+ // forced), tens digits picked so x>y always holds. regroup:2 (rung 8) was likewise identical to
  // regroup:1 (same plateau as block B). Fixed: minuend becomes a 3-digit "just over 100" bridge number
  // with its tens digit forced to 0 (e.g. 104), so subtracting a 2-digit number forces a genuine "borrow
  // across a zero" — a well-known harder step than plain 2-digit borrowing (104−47: ones can't borrow from
  // an empty tens, so it borrows from the hundreds first) — mirrors block B's 3-digit escalation rather
  // than inventing unrelated content.
+ // regroup:3 (rung 10 only) fixed the same rung9/rung10 plateau as block B: rung9 and rung10 both set
+ // regroup:2 so this block was identical across the ladder's last two rungs (300-sample check: rung9
+ // 1-89 vs rung10 1-89). regroup:3 escalates "borrow across ONE zero" (104−47, tens is empty but ones
+ // isn't) to "borrow across TWO zeros" (100−47 or 200−83: both tens AND ones are empty, so the borrow
+ // must cascade through two empty places before it reaches a digit to subtract from) — a well-documented
+ // harder step in the same NCERT ch.6 borrowing progression, not new content.
  if(L.subMax){let sb=[],a=[];for(let i=0;i<6;i++){const cap=L.subMax;let x,y;
-  if(L.regroup>=2){const xo=R(0,8),yo=R(xo+1,9),yt=R(1,9);x=100+xo;y=yt*10+yo;}
+  if(L.regroup>=3){const h=R(1,3);x=h*100;y=R(11,89);}
+  else if(L.regroup>=2){const xo=R(0,8),yo=R(xo+1,9),yt=R(1,9);x=100+xo;y=yt*10+yo;}
   else if(L.regroup){const xo=R(0,8),yo=R(xo+1,9),tmax=Math.max(2,Math.floor(cap/10)),xt=R(2,tmax),yt=R(1,xt-1);x=xt*10+xo;y=yt*10+yo;}
   else{x=R(Math.floor(cap*0.4),cap);y=R(1,x-1);}
   sb.push((i+1)+')  '+x+' − '+y+' = ____');a.push(x-y);}blocks.push({h:'C. Take away',two:true,items:sb});ans.push('C: '+a.join(', '));}
@@ -859,26 +883,36 @@ function ws_maths_mirayah(li){const L=LEVELS.mirayah.maths[li];let blocks=[],ans
  // is reserved for the rung actually named "Story sums") using ratios chosen so li2/li3 (addMax/subMax:20)
  // reproduce the exact original 3-9/2-6 and 6-12/1-5 ranges unchanged, while li4 (addMax/subMax:80)
  // scales up proportionally into the 20s-40s instead of staying single-digit.
- // regroup:2 bridge (rungs 9-10 "Two-step (little)"->"Bridge to big-girl") — story:2's kind0/1/2 all
- // derived purely off addMax/subMax which cap out at 99/99 for rungs 7-10, so Block G was flat across
- // all four of those rungs even though Blocks B/C were re-engineered (see block B/C comments above) to
- // keep escalating past that same plateau via regroup:2 forcing a 3-digit bridge. Fixed: when
- // L.regroup>=2, kind0/kind2 reuse block B's exact ones+tens digit-forcing trick (ao+bo>=10, at+bt>=9 so
- // the total is guaranteed >=100, e.g. "68 shells ... 57 more ... 125 shells") and kind1 reuses block C's
- // exact borrow-across-zero trick (minuend fixed at 100+ones, e.g. "104 bangles ... gave away 97 ...").
+ // regroup:2 bridge (rung 8 "Two-step (little)") — story:2's kind0/1/2 all derived purely off
+ // addMax/subMax which cap out at 99/99 for rungs 7-10, so Block G was flat across all four of those
+ // rungs even though Blocks B/C were re-engineered (see block B/C comments above) to keep escalating past
+ // that same plateau via regroup:2 forcing a 3-digit bridge. Fixed: when L.regroup>=2, kind0/kind2 reuse
+ // block B's exact ones+tens digit-forcing trick (ao+bo>=10, at+bt>=9 so the total is guaranteed >=100,
+ // e.g. "68 shells ... 57 more ... 125 shells") and kind1 reuses block C's exact borrow-across-zero trick
+ // (minuend fixed at 100+ones, e.g. "104 bangles ... gave away 97 ...").
+ // regroup:3 bridge (rung 10 "Bridge to big-girl" only) fixed the same rung9/rung10 plateau found in
+ // Blocks B/C: rung9 and rung10 both set regroup:2 so Block G was near-identical across the ladder's last
+ // two rungs (300-sample check: rung9 range 3-194 vs rung10 4-191). Fixed: when L.regroup>=3, kind0/kind2
+ // reuse Block B's new regroup:3 trick (3-digit start + 2-digit add, carry cascading through ones AND
+ // tens into the hundreds, e.g. "168 shells ... 57 more ... 225 shells") and kind1 reuses Block C's new
+ // regroup:3 borrow-across-two-zeros trick (minuend fixed at a flat hundred, e.g. "200 bangles ... gave
+ // away 83 ...").
  if(L.story){
   if(L.story>=2){
-   const kind=R(0,2),addCap=L.addMax||60,subCap=L.subMax||addCap,bridge=L.regroup>=2;
+   const kind=R(0,2),addCap=L.addMax||60,subCap=L.subMax||addCap,bridge=L.regroup>=2,bridge3=L.regroup>=3;
    if(kind===0){let a,b;
-    if(bridge){const ao=R(1,9),bo=R(10-ao,9),at=R(4,9),bt=R(Math.max(1,9-at),9);a=at*10+ao;b=bt*10+bo;}
+    if(bridge3){const ao=R(1,9),bo=R(10-ao,9),at=R(5,9),bt=R(Math.max(1,9-at),9);a=100+at*10+ao;b=bt*10+bo;}
+    else if(bridge){const ao=R(1,9),bo=R(10-ao,9),at=R(4,9),bt=R(Math.max(1,9-at),9);a=at*10+ao;b=bt*10+bo;}
     else{a=R(20,Math.max(21,addCap-15));b=R(10,Math.max(11,addCap-a));}
     blocks.push({h:'G. Story sum',items:[P(NAMES)+' collected '+a+' shells and found '+b+' more. How many shells now?  ____'],write:1});ans.push('G: '+(a+b));}
    else if(kind===1){let a,b;
-    if(bridge){const xo=R(0,8),yo=R(xo+1,9),yt=R(1,9);a=100+xo;b=yt*10+yo;}
+    if(bridge3){const h=R(1,3);a=h*100;b=R(11,89);}
+    else if(bridge){const xo=R(0,8),yo=R(xo+1,9),yt=R(1,9);a=100+xo;b=yt*10+yo;}
     else{a=R(Math.floor(subCap*0.5),subCap);b=R(10,a-5);}
     blocks.push({h:'G. Story sum',items:[P(NAMES)+' had '+a+' bangles and gave away '+b+'. How many bangles left?  ____'],write:1});ans.push('G: '+(a-b));}
    else{let start,total;
-    if(bridge){const ao=R(1,9),bo=R(10-ao,9),at=R(4,9),bt=R(Math.max(1,9-at),9);start=at*10+ao;total=start+(bt*10+bo);}
+    if(bridge3){const ao=R(1,9),bo=R(10-ao,9),at=R(5,9),bt=R(Math.max(1,9-at),9);start=100+at*10+ao;total=start+(bt*10+bo);}
+    else if(bridge){const ao=R(1,9),bo=R(10-ao,9),at=R(4,9),bt=R(Math.max(1,9-at),9);start=at*10+ao;total=start+(bt*10+bo);}
     else{start=R(20,50);total=R(start+10,Math.max(start+11,addCap));}
     blocks.push({h:'G. Story sum',items:[start+' birds were sitting on a tree. A few more joined. Now there are '+total+' birds. How many birds joined?  ____'],write:1});ans.push('G: '+(total-start));}
   }else{
@@ -1147,16 +1181,19 @@ function ws_english_sarah(li,book){const L=LEVELS.sarah.english[li];let blocks=[
  if(L.tech){
   // rung 9 (write:'rhetoric') must drill the exact two devices WRITE_TASKS.rhetoric hardcodes;
   // other tech-gated rungs (debate/personal/interview) don't name specific devices, so they still
-  // draw randomly from the full RHETORIC bank.
+  // draw randomly from the full RHETORIC bank — and on synthetic Independent Study rungs, L.tech
+  // itself keeps climbing (intensifyRung's generic numeric-scaling loop includes 'tech', same as
+  // every other knob it doesn't explicitly exclude), so the draw count now actually grows with it —
+  // 1+L.tech, capped at the bank's own size — instead of staying dead-flag-pinned at exactly 2
+  // forever regardless of tier (see growth-map-exhaustive-audit finding, english/sarah Block E).
+  // Base hand-authored rungs 9-12 all set tech:1, so 1+1=2 — identical to the old fixed slice(0,2),
+  // no behavior change there; only synthetic rungs past rung 12 actually escalate.
   const td=L.write==='rhetoric'
    ? shuf([RHETORIC.find(d=>d.name==='Rhetorical question'),RHETORIC.find(d=>d.name==='Rule of three')])
-   : shuf(RHETORIC).slice(0,2);
-  blocks.push({h:'E. Learn the technique',items:[
-    '1)  '+td[0].name+' — '+td[0].explain+'.  Example: '+td[0].example,
-    '2)  '+td[1].name+' — '+td[1].explain+'.  Example: '+td[1].example
-   ],write:0,ungraded:true});
+   : shuf(RHETORIC).slice(0,Math.min(RHETORIC.length,1+L.tech));
+  blocks.push({h:'E. Learn the technique',items:td.map((d,i)=>(i+1)+')  '+d.name+' — '+d.explain+'.  Example: '+d.example),write:0,ungraded:true});
   blocks.push({h:'F. Spot the technique',items:[
-    '1)  Look at the passage in Block C. Can you find either technique used there? If yes, quote it and name it. If not, explain how the writer creates a similar effect in their own words.  ____',
+    '1)  Look at the passage in Block C. Can you find any of these techniques used there? If yes, quote it and name it. If not, explain how the writer creates a similar effect in their own words.  ____',
     '2)  Now write your own sentence using '+td[0].name+':  ____'
    ],write:2});
   ans.push('E/F techniques: '+td.map(d=>d.name+' = '+d.explain).join('; ')+' (F: Q1/Q2 open — accept any correctly identified device or grammatically sound original sentence using it)');
