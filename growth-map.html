@@ -1081,9 +1081,14 @@ const WRITE_TASKS={
 // verified by re-reading LEVELS.sarah.english[8..11] directly; a prior finding said "rungs 9-11" but that
 // undercounted rung 12, which also sets tech:1). L.tech was set on these rungs from the start but
 // ws_english_sarah never read it — a dead flag (see content/english-sarah-rung1.md's dead-flag audit,
-// re-confirmed in rungs 5-8's audits). Fixed by wiring a real "Spot the technique" block off it, directly
-// matching WRITE_TASKS.rhetoric's own instruction to "use at least one rhetorical question and one rule of
-// three" — the block teaches/drills the exact devices the writing task then asks the child to produce.
+// re-confirmed in rungs 5-8's audits). Fixed by wiring a real "Spot the technique" block off it.
+// On rung 9 specifically (L.write==='rhetoric') the two devices drawn are FORCED to be "Rhetorical
+// question" + "Rule of three" (not a random shuf().slice(0,2)) because WRITE_TASKS.rhetoric hardcodes
+// those exact two names in its instruction — a prior version drew uniformly at random from all 5
+// RHETORIC entries, so ~83% of generated worksheets drilled two devices that were NOT the pair the
+// writing challenge then demanded (verified live: 5/30 draws contained both by chance, matching the
+// 1/C(5,2)=10% baseline). Rungs 10-12 (debate/personal/interview) still draw randomly from RHETORIC —
+// their WRITE_TASKS entries don't name specific devices, so there is nothing for Block E to be forced to.
 // NOTE: tech:1 being identical on all of rungs 9-12 only differentiates rung 8 (no Block E) from rung 9+
 // (has Block E) — it does NOT differentiate rungs 9/10/11/12 from each other, since Block E always draws
 // 2 random RHETORIC items regardless of rung. Combined with vt/pt/gt all being identical too, and the
@@ -1134,7 +1139,12 @@ function ws_english_sarah(li,book){const L=LEVELS.sarah.english[li];let blocks=[
  // in that particular draw), then produce their own sentence using one device — direct prep for WRITE_TASKS.rhetoric.
  let wLetter='E';
  if(L.tech){
-  const td=shuf(RHETORIC).slice(0,2);
+  // rung 9 (write:'rhetoric') must drill the exact two devices WRITE_TASKS.rhetoric hardcodes;
+  // other tech-gated rungs (debate/personal/interview) don't name specific devices, so they still
+  // draw randomly from the full RHETORIC bank.
+  const td=L.write==='rhetoric'
+   ? shuf([RHETORIC.find(d=>d.name==='Rhetorical question'),RHETORIC.find(d=>d.name==='Rule of three')])
+   : shuf(RHETORIC).slice(0,2);
   blocks.push({h:'E. Spot the technique',items:[
     '1)  '+td[0].name+' — '+td[0].explain+'.  Example: '+td[0].example,
     '2)  '+td[1].name+' — '+td[1].explain+'.  Example: '+td[1].example,
