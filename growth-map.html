@@ -670,7 +670,13 @@ function m_mistake(L){const easy=[
   ['A child wrote:  “A number is increased by 20%, then decreased by 20%, so it ends up back where it started.”  Is this correct? Explain with an example.','wrong — the two 20%s are taken from different amounts; e.g. 100 → 120 (+20%) → 96 (−20% of 120) — you end up with 96, not 100']];
  const proofBank=[
   ['A child wrote:  “Every prime number is odd, so adding two primes always gives an even number.”  Find the flaw in this reasoning and give a counterexample.','flawed — 2 is a prime number that is even; 2 + 3 = 5, which is odd, so the claim breaks down whenever 2 is one of the primes']];
+ const mul2Bank=[
+  ['A child worked out 6 × 14 like this:  6 × 10 = 16,  then 6 × 4 = 24,  then 16 + 24 = 40.  Find the mistake and fix it.','wrong — 6 × 10 = 60, not 16; correct total = 60 + 24 = 84']];
+ const chal2Bank=[
+  ['A child wrote:  3 + 4 × 2 = 14 (added first, then multiplied).  Find the mistake and fix it.','wrong — multiply before you add: 4 × 2 = 8, then 3 + 8 = 11']];
  let bank=(L.chal>=3)?hard:easy;
+ if(L.mul2&&L.chal<3)bank=bank.concat(mul2Bank);
+ if(L.chal===2)bank=bank.concat(chal2Bank);
  if(L.frac&&L.chal<3)bank=bank.concat(fracEasy);
  if(L.longmul)bank=bank.concat(longmulBank);
  if(L.dec)bank=bank.concat(decBank);
