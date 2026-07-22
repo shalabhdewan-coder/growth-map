@@ -229,10 +229,10 @@ const LEVELS={
    {n:'Persuasive writing',   vt:'hard',  pt:3, gt:'hard', gc:5, write:'persuade'},
    {n:'Structure & argument', vt:'hard',  pt:3, gt:'hard', gc:6, write:'argument'},
    {n:'Essay basics',         vt:'hard',  pt:3, gt:'hard', gc:7, write:'essay'},
-   {n:'Rhetoric & technique', vt:'harder',pt:3, gt:'hard', gc:5, write:'rhetoric', tech:1},
-   {n:'Debate — both sides',  vt:'harder',pt:3, gt:'hard', gc:6, write:'debate',   tech:1},
-   {n:'Personal voice',       vt:'harder',pt:3, gt:'hard', gc:7, write:'personal', tech:1},
-   {n:'Interview reasoning',  vt:'harder',pt:3, gt:'hard', gc:8, write:'interview',tech:1}
+   {n:'Rhetoric & technique', vt:'harder',pt:3, gt:'hard', gc:8, write:'rhetoric', tech:1},
+   {n:'Debate — both sides',  vt:'harder',pt:3, gt:'hard', gc:9, write:'debate',   tech:1},
+   {n:'Personal voice',       vt:'harder',pt:3, gt:'hard', gc:10, write:'personal', tech:1},
+   {n:'Interview reasoning',  vt:'harder',pt:3, gt:'hard', gc:11, write:'interview',tech:1}
   ]
  },
  mirayah:{
@@ -1163,9 +1163,15 @@ const WRITE_TASKS={
 // 2 random RHETORIC items regardless of rung. Combined with vt/pt/gt all being identical too, and the
 // writing-challenge block being ungraded:true (commit 4bd9ee8), the graded MTOTAL (Blocks A/C/D/E) was
 // byte-identical across all four rungs (20/20/20/20) — the mastery gate advanced a child through 4 rungs
-// on literally the same graded difficulty each time. Fixed the same way rungs 6-8 were staggered
-// (commit 67e6797): gc (Block D grammar-fix count) now climbs 5→6→7→8 across rungs 9-12, so Block D — and
-// therefore MTOTAL — actually grows each rung instead of staying flat.
+// on literally the same graded difficulty each time. First fixed the same way rungs 6-8 were staggered
+// (commit 67e6797): gc (Block D grammar-fix count) climbing 5→6→7→8 across rungs 9-12. BUT that restart
+// at gc=5 ignored that gc had already climbed to 7 by rung 8 (from the separate rungs-6-8 staggering fix,
+// commit 67e6797) — rung8 (no Block F) landed at A5+C6+D7=18, and rung9 (gc restarted to 5, +Block F's 2)
+// landed at A5+C6+D5+F2=18 too: an exact coincidental collision at the rung8→rung9 seam, so the 80%
+// mastery bar was identical there even though rung 9 introduces a whole new taught skill (rhetorical
+// technique) and shifts vocab tier hard→harder. Re-fixed by continuing the gc climb from rung 8's gc=7
+// instead of restarting: gc now runs 8→9→10→11 across rungs 9-12 (well within GRAMMAR.hard's 20-item
+// bank), so MTOTAL keeps climbing 18→21→22→23→24 instead of plateauing at the rung8/9 boundary.
 const RHETORIC=[
  {name:'Rhetorical question',explain:'a question asked to make a point, not to get a real answer',example:'“Isn’t it obvious that reading makes you smarter?”'},
  {name:'Rule of three',explain:'listing three things together to make an idea feel complete and powerful',example:'“Fast, fun and unforgettable.”'},
