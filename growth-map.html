@@ -136,11 +136,8 @@
 /* ============================================================
    OUR GROWTH MAP — v9  (the "step game")
    Every ✓ Done = an intelligent level-up, never a repeat.
-   Progress autosaves to localStorage on this device (survives closing
-   the tab/browser, reopening the plain link, anything) AND to the page
-   URL (#state) so a specific state can still be shared/handed off via
-   link. A hash present in the URL wins on load (deliberate override for
-   sharing); with no hash, localStorage is the fallback.
+   Progress is saved in the page URL (#state), so a reload
+   keeps your place. (No localStorage — by design.)
    ============================================================ */
 
 /* ===== helpers ===== */
@@ -508,7 +505,7 @@ const LEVEL={
 };
 const BOOK ={sarah:{idx:0,custom:null,done:[]}, mirayah:{idx:0,custom:null,done:[]}};
 
-/* ===== persistence: localStorage (real autosave) + URL hash (shareable state) =====
+/* ===== persistence via URL hash (survives reload, no localStorage) =====
    X = how many synthetic "Independent Study" rungs doDoneLevelUp has pushed
    onto each ladder, past BASE_LADDER_LEN. Without this, only the numeric
    LEVEL index was saved — on reload LEVELS[g][k] gets rebuilt fresh from the
@@ -517,26 +514,18 @@ const BOOK ={sarah:{idx:0,custom:null,done:[]}, mirayah:{idx:0,custom:null,done:
    ladder-extension progress every time the page reloaded. Saving the push
    count lets load() replay intensifyRung the same number of times BEFORE
    computing the clamp, so the ladder is the right length again first. */
-const LS_KEY='growthMapState_v1';
 function save(){
  try{
   const ext={};
   for(const g of ['sarah','mirayah']){ext[g]={};for(const k of Object.keys(LEVELS[g]))ext[g][k]=LEVELS[g][k].length-BASE_LADDER_LEN[g][k];}
   const s={L:LEVEL,X:ext,B:{sarah:{i:BOOK.sarah.idx,d:BOOK.sarah.done,c:BOOK.sarah.custom},mirayah:{i:BOOK.mirayah.idx,d:BOOK.mirayah.done,c:BOOK.mirayah.custom}}};
-  const json=JSON.stringify(s);
-  history.replaceState(null,'','#'+encodeURIComponent(json));
-  try{localStorage.setItem(LS_KEY,json);}catch(e){/* private-browsing/storage-blocked: hash still works this tab */}
+  history.replaceState(null,'','#'+encodeURIComponent(JSON.stringify(s)));
  }catch(e){/* if hash write is blocked, stay in-memory */}
 }
 function load(){
  try{
-  // A hash in the URL is a deliberate share/handoff — it wins. Otherwise fall back
-  // to this device's own autosave, so a bare/fresh link still resumes real progress.
-  let json=null;
-  if(location.hash&&location.hash.length>1) json=decodeURIComponent(location.hash.slice(1));
-  else try{json=localStorage.getItem(LS_KEY);}catch(e){/* storage blocked */}
-  if(!json)return;
-  const s=JSON.parse(json);
+  if(!location.hash||location.hash.length<2)return;
+  const s=JSON.parse(decodeURIComponent(location.hash.slice(1)));
   if(s.X){for(const g of ['sarah','mirayah'])for(const k of Object.keys(LEVELS[g])){
     const n=s.X[g] && s.X[g][k];
     if(Number.isInteger(n)&&n>0){
@@ -1492,11 +1481,8 @@ function ws_music(gk,li){const lad=LEVELS[gk].music,L=lad[li];
     sight/aural) are all plain strings, so intensifyRung's generic numeric scaling only
     inflates `mins` past the last hand-authored rung — the printed piece/technique/sight/
     aural text used to repeat Grade 8 verbatim forever. `boost` drives a real, escalating
-    piece-practice ask here instead: the number of extra recital-ready pieces grows with tier
-    (+1 piece every ~3 tiers, capped at 4) so each successive synthetic rung actually asks for
-    more than the one before it, not just the same static "add a second piece" line every time. */
- const extraPieces=L.boost?Math.min(1+Math.floor((L.boost-1)/3),4):0;
- const boostNote=L.boost?' — Independent Study tier '+L.boost+': add '+extraPieces+' extra recital-ready piece'+(extraPieces>1?'s':'')+' and push the tempo/dynamics further':'';
+    piece-practice ask here instead, so each successive synthetic rung actually asks for more. */
+ const boostNote=L.boost?' — Independent Study tier '+L.boost+': add a second recital-ready piece and push the tempo/dynamics further':'';
  return{title:'🎵 Music — '+who(gk),sub:'Level '+(li+1)+'/'+lad.length+' · '+L.n,level:'Graded music pathway',keyLabel:'Teacher / parent notes',note:'Little and often beats one long session. Enjoy the music.',
  blocks:[
   {h:'Technique & scales',items:[L.tech]},
@@ -1504,7 +1490,7 @@ function ws_music(gk,li){const lad=LEVELS[gk].music,L=lad[li];
   {h:'Sight-reading',items:[L.sight]},
   {h:'Aural / listening',items:[L.aural]},
   {h:'Practice time',items:['Aim for about '+L.mins+' minutes today.'],write:1}
- ],ans:['✅ Level up when: this rung’s piece is performance-ready and the scales are secure.'+(L.boost?' Plus the tier-'+L.boost+' extra piece'+(extraPieces>1?'s':'')+' polished.':'')]};}
+ ],ans:['✅ Level up when: this rung’s piece is performance-ready and the scales are secure.'+(L.boost?' Plus the tier-'+L.boost+' extra piece polished.':'')]};}
 function ws_riding(gk,li){const lad=LEVELS[gk].riding,L=lad[li];
  /* Same dead-flag class as ws_swim: RIDE's fields (ground/flat/ex/safe) are all plain
     strings, so intensifyRung's generic numeric scaling has nothing to grab past the last
